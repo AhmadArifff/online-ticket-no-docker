@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.4
-**Version**: 1.4
+**Status**: Rework Required - Agentic Alignment v1.5
+**Version**: 1.5
 **Last Updated**: 2026-09-16
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -504,8 +504,8 @@ Status is updated together with prototype changes so visual decisions remain tra
 | `payment-001` | Partial | Retry/support behavior, webhook-pending detail, and duplicate-request fixture | `design-prototype/pages/payment-result.html` |
 | `ticket-001` | Partial | Refunded/cancelled data, transfer/refund states, and offline transition test | `design-prototype/pages/ticket-wallet.html` |
 | `ticket-002` | Implemented fixture | QR visual review, brightness/zoom/download verification, and invalid/used acceptance evidence | `design-prototype/pages/ticket-detail.html` |
-| `organizer-001` | Pending | Build dashboard fixture and permission/no-data states | Not created |
-| `organizer-002` | Pending | Build editor fixture, unsaved changes, conflict, and autosave failure | Not created |
+| `organizer-001` | Implemented fixture | Permission/no-data evidence and independent review remain | `design-prototype/pages/organizer-dashboard.html` |
+| `organizer-002` | Implemented fixture | Conflict and autosave-failure evidence remain | `design-prototype/pages/organizer-editor.html` |
 | `admin-001` | Pending | Build operations fixture, RBAC denial, confirmation, and audit detail | Not created |
 | `system-001` | Implemented fixture | Connect shared states to page review evidence and keyboard recovery checks | `design-prototype/pages/system-states.html` |
 
@@ -1718,6 +1718,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 | 1.2 | 2026-09-15 | vergenscande | Added agentic decision authority, approval gates, shared-resource locking, fail-graceful contract, logging governance, and accountable risk tracking |
 | 1.3 | 2026-09-15 | vergenscande | Added HTML-first visual prototype phase, page-by-page design breakdown, motion/3D interaction rules, and prototype-to-monorepo approval gate |
 | 1.4 | 2026-09-16 | vergenscande | Added prototype implementation tracking, visual change log, ticket detail fixture, and system-state fixture |
+| 1.5 | 2026-09-16 | vergenscande | Added organizer dashboard and event editor fixtures with metrics, live preview, autosave, ticket tiers, validation, and publish guard |
 
 ---
 

@@ -19,6 +19,8 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 - Ticket QR detail with valid, used, invalid, and offline states
 - Bright scan mode, QR zoom, ticket download, and wallet save preview
 - System state gallery: 404, 500, maintenance, offline, loading, empty, and access denied
+- Organizer dashboard with sales metrics, event switcher, chart, activity, and export preview
+- Event editor with live preview, autosave state, ticket type editor, validation, and publish guard
 
 ## Prototype pages
 
@@ -34,8 +36,8 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 | Ticket wallet | `pages/ticket-wallet.html` | Partial |
 | Ticket and QR detail | `pages/ticket-detail.html` | Implemented fixture |
 | System states | `pages/system-states.html` | Implemented fixture |
-| Organizer dashboard | Not created | Pending |
-| Event editor | Not created | Pending |
+| Organizer dashboard | `pages/organizer-dashboard.html` | Implemented fixture |
+| Event editor | `pages/organizer-editor.html` | Implemented fixture |
 | Admin operations | Not created | Pending |
 
 The prototype remains fixture-only. It has no production authentication, payment provider, Supabase connection, service worker, or API integration.
