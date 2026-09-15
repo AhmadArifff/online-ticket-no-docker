@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.2
-**Version**: 1.2
+**Status**: Rework Required - Agentic Alignment v1.3
+**Version**: 1.3
 **Last Updated**: 2026-09-15  
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -17,15 +17,16 @@
 5. [Project Overview](#project-overview)
 6. [Technical Architecture](#technical-architecture)
 7. [Monorepo Structure](#monorepo-structure)
-8. [Feature Requirements (OODA-Aligned)](#feature-requirements-ooda-aligned)
-9. [Technology Stack](#technology-stack)
-10. [Deployment Strategy](#deployment-strategy)
-11. [Database Schema](#database-schema)
-12. [Concurrency & Atomic Locking Strategy](#concurrency--atomic-locking-strategy)
-13. [Error Handling & Structured Logging](#error-handling--structured-logging)
-14. [Tech Critic Review (Assumptions & Risks)](#tech-critic-review-assumptions--risks)
-15. [Security Considerations](#security-considerations)
-16. [Development Roadmap](#development-roadmap)
+8. [Visual Design Prototype](#visual-design-prototype)
+9. [Feature Requirements (OODA-Aligned)](#feature-requirements-ooda-aligned)
+10. [Technology Stack](#technology-stack)
+11. [Deployment Strategy](#deployment-strategy)
+12. [Database Schema](#database-schema)
+13. [Concurrency & Atomic Locking Strategy](#concurrency--atomic-locking-strategy)
+14. [Error Handling & Structured Logging](#error-handling--structured-logging)
+15. [Tech Critic Review (Assumptions & Risks)](#tech-critic-review-assumptions--risks)
+16. [Security Considerations](#security-considerations)
+17. [Development Roadmap](#development-roadmap)
 
 ---
 
@@ -133,6 +134,7 @@ The **Expert Reviewer (user/project owner)** is the final authority for blocked 
 | Gate | Required reviewers | Evidence before approval |
 |---|---|---|
 | Architecture and stack | Expert Reviewer + Tech Critic | Decision record, dependency/version validation, threat and scalability assumptions |
+| Visual design prototype | Expert Reviewer + Tech Critic + QA | HTML prototype preview, responsive screenshots, interaction checklist, accessibility and performance findings |
 | Database and RLS | Backend Builder + Security Reviewer + Expert Reviewer | Migration review, RLS tests, rollback plan |
 | Payment and inventory | Backend Builder + QA + Security Reviewer | Idempotency, webhook retry/reconciliation, concurrency report with zero overbooking |
 | Production deployment | QA + Security Reviewer + Expert Reviewer | CI result, smoke test, observability check, rollback rehearsal |
@@ -331,6 +333,14 @@ online-ticket-no-docker/
 │   ├── DEPLOYMENT.md                    # Deployment guide
 │   └── CONTRIBUTING.md                  # Contribution guidelines
 │
+├── design-prototype/                    # Standalone HTML visual prototype
+│   ├── pages/                            # Page-by-page screens and flows
+│   ├── styles/                           # Tokens, layout, components
+│   ├── scripts/                          # Fixture-only interactions and motion
+│   ├── assets/                           # Approved prototype assets
+│   ├── fixtures/                         # Non-sensitive sample data
+│   └── README.md                         # Local preview and review guide
+│
 ├── .github/
 │   ├── workflows/                       # CI/CD workflows
 │   │   ├── test.yml
@@ -357,6 +367,131 @@ online-ticket-no-docker/
 - **Dependency Management**: Workspace protocol
 - **Code Quality**: ESLint, Prettier, TypeScript strict mode
 - **Testing**: Jest, Vitest, Playwright E2E
+
+---
+
+## Visual Design Prototype
+
+### Purpose and Sequence
+
+Before building the production UI inside the monorepo, the team must create a standalone visual prototype using plain HTML, CSS, and browser JavaScript. This prototype is a rough but interactive representation used to validate information architecture, visual direction, responsive behavior, motion, and interaction states with the Expert Reviewer.
+
+The delivery sequence is locked:
+
+```text
+Observe requirements
+  -> Build standalone HTML visual prototype
+  -> Review every page and interaction state
+  -> Record approved design evidence
+  -> Translate approved patterns into monorepo components
+  -> Implement production behavior and data integration
+```
+
+The HTML prototype must not become a parallel production application. It may use fixture data only, must not contain real credentials, and must not be connected to Supabase, payment providers, authentication, or production APIs.
+
+### Prototype Structure
+
+```text
+design-prototype/
+├── index.html                 # Prototype entry and page navigation
+├── pages/                     # One HTML page or route per screen
+├── styles/
+│   ├── tokens.css             # Color, type, spacing, motion tokens
+│   ├── layout.css             # Responsive layout primitives
+│   └── components.css         # Buttons, forms, cards, dialogs, states
+├── scripts/
+│   ├── prototype-router.js     # Fixture-only navigation
+│   ├── interactions.js         # Tabs, filters, dialogs, forms, states
+│   └── motion.js               # Reduced-motion-aware transitions
+├── assets/
+│   ├── images/                # Approved visual assets or placeholders
+│   └── icons/
+├── fixtures/                  # Non-sensitive representative data
+└── README.md                  # How to preview and review the prototype
+```
+
+The prototype should open locally in a browser without a build step where possible. If a local server is needed for module loading, it must use a documented static command and remain separate from the production development server.
+
+### Visual Direction and Design System
+
+The visual system must feel intentional, accessible, and appropriate for a ticket marketplace rather than a generic dashboard:
+
+- Define CSS custom properties for color roles, typography, spacing, radii, elevation, focus, and motion duration.
+- Use an expressive display typeface for event identity and a highly readable UI typeface for controls and transactional content. Font loading must have a fallback and must not block content.
+- Use a balanced palette with a clear brand accent, neutral surfaces, semantic success/warning/error colors, and sufficient contrast. Do not rely on purple-on-white defaults or a single-hue interface.
+- Prefer structured full-width sections and focused cards only for repeated items, dialogs, and genuinely framed tools. Do not nest cards inside cards.
+- Use familiar icons for compact actions and provide accessible names/tooltips for unfamiliar icon-only controls.
+- Define mobile, tablet, and desktop breakpoints through layout constraints rather than scaling every value with viewport width.
+
+### Motion, 3D, and Interactive Design Rules
+
+Every page prototype must demonstrate the states that users will experience, not only the default screenshot:
+
+- **Motion**: page entrance, staggered event discovery, filter transitions, modal/dialog transitions, loading/success/error transitions, and checkout progress. Motion must communicate hierarchy and state, not decorate every element.
+- **3D elements**: use purposeful CSS 3D or Three.js enhancements for event hero objects, ticket/card perspective, map or venue previews, and interactive ticket previews. 3D must remain optional progressive enhancement, have a static fallback, preserve readable content, and respect `prefers-reduced-motion`.
+- **Interactions**: navigation, search, filters, tabs, pagination, favorite/save, ticket quantity stepper, checkout stepper, dialogs, tooltips, copy/download actions, QR/ticket preview, organizer forms, and offline/retry states must be clickable in the prototype.
+- **Responsive behavior**: each page must be tested at mobile, tablet, and desktop widths. Navigation, tables, grids, forms, dialogs, and ticket previews must reflow without overlap or horizontal clipping.
+- **Accessibility**: keyboard navigation, visible focus, semantic landmarks, labels, error descriptions, color-independent status, sufficient contrast, touch targets, and reduced-motion behavior are required in the prototype.
+- **Performance**: avoid large decorative assets, render only necessary 3D scenes, lazy-load noncritical media, and provide a loading state for every interactive surface.
+
+### Global Click Feedback Contract
+
+Every clickable element in the rough HTML prototype and the later monorepo UI must provide immediate, intentional feedback. A click is not considered complete when only the data state changes; the visual response must also explain that the action was received.
+
+| Interaction moment | Required feedback | Constraint |
+|---|---|---|
+| Pointer hover | Subtle color, elevation, border, or position change | Must not cause layout shift or obscure adjacent content |
+| Pointer/touch press | `:active` compression or tactile scale response, typically 0.97-0.99 | Must complete quickly and remain usable on touch screens |
+| Click/tap activation | Short ripple or localized highlight from the activation point | Must be clipped to the control and never become decorative noise |
+| Keyboard focus | Visible focus ring and equivalent active state | Cannot rely on color alone |
+| Async action | Loading indicator or pending state with the control disabled | Prevent duplicate submission and preserve accessible name |
+| Success | Check, color, or toast transition that confirms the result | Must be announced through an accessible status region when meaningful |
+| Failure | Error shake or border transition plus actionable message | Respect reduced motion and never communicate failure through motion alone |
+| Toggle/selection | Animated state transition and `aria-pressed`/selected state | State must remain understandable without animation |
+
+Implementation rules:
+
+- Use one reusable interaction utility/class for buttons, links, chips, cards, tabs, menus, steppers, dialogs, and category controls.
+- Use CSS transitions/keyframes for local feedback; use JavaScript only to calculate ripple position or coordinate state changes.
+- Keep click feedback between 120-280ms unless the action is a documented loading or page-transition state.
+- Do not add animation to sensitive payment or QR scanning surfaces that could distract from reading or scanning.
+- Every animated control requires `prefers-reduced-motion: reduce` behavior that removes displacement and reduces feedback to an instant color/border/focus change.
+- Every prototype page review must record click-feedback coverage for default, hover, focus, press, success, pending, error, disabled, and reduced-motion states.
+
+### Page-by-Page Design Breakdown
+
+Each page below requires a standalone prototype state, responsive layout, interaction states, and an independent review verdict before production implementation.
+
+| Page / ID | Purpose and visual composition | Styling, motion, and 3D direction | Required interactions and states |
+|---|---|---|---|
+| `home-001` Home / discovery | Strong event-led first viewport, search, featured events, categories, trust and service signals | Editorial event imagery, restrained depth, staggered event reveals, optional 3D event object with static image fallback | Search, category navigation, featured carousel, loading, empty, offline, keyboard focus |
+| `event-001` Event listing | Filterable event grid/list with location, date, price, category, and sort controls | Dense scan-friendly layout, filter drawer on mobile, card hover/press motion, optional map depth layer | Search, filters, sort, pagination, favorites, no results, loading, API failure |
+| `event-002` Event detail | Hero media, event facts, venue, organizer, ticket types, availability, reviews | Hero media transition, ticket-tier emphasis, venue/map preview with optional 3D perspective | Choose ticket type, quantity, favorite, share, realtime availability, sold-out, expired event |
+| `auth-001` Login and signup | Focused authentication form with provider actions and clear trust cues | Minimal motion, inline validation, no distracting 3D around sensitive forms | Password visibility, provider login, validation errors, loading, rate limit, success, recovery |
+| `auth-002` Verification and reset | Clear status-led flow for email verification and password reset | Progress/status animation with reduced-motion fallback | Resend, change email, expired link, invalid token, completed state |
+| `checkout-001` Checkout | Stepper for attendee details, order summary, payment handoff, and terms | Persistent summary on desktop, bottom sheet on mobile, progress transition, no decorative 3D that competes with payment | Quantity edit, voucher, terms, submit, timeout, locked inventory, validation and retry |
+| `payment-001` Payment result | Success, pending, failed, and cancelled outcomes with next actions | Outcome-specific semantic styling, concise confirmation motion, ticket reveal transition | Retry payment, view order, contact support, webhook pending, duplicate request |
+| `ticket-001` Ticket wallet | Scannable list of upcoming, past, used, refunded, and cancelled tickets | Ticket cards with controlled perspective/3D preview, offline badge, subtle list motion | Search, filter, open ticket, transfer, refund request, loading, empty, offline |
+| `ticket-002` Ticket and QR detail | Large QR, event identity, ticket facts, entry instructions, safety status | High-contrast scan surface, optional physical-ticket perspective, no motion during scanning | Brightness mode, zoom, download, add to wallet, offline warning, used/invalid state |
+| `organizer-001` Organizer dashboard | Sales, attendance, events, alerts, and quick actions | Operational density, charts with progressive reveal, restrained data animation | Date range, event switcher, export, loading, permission denied, no data |
+| `organizer-002` Event editor | Multi-step event and ticket-type creation form | Section transitions, image crop preview, clear unsaved-change state | Draft/save/publish, ticket tier editor, image upload, validation, conflict, autosave failure |
+| `admin-001` Admin operations | Users, events, orders, reports, config, and audit activity | Table-first responsive layout, status tokens, no decorative 3D in high-risk operations | Search, filters, bulk actions, confirmation dialog, audit detail, permission denied |
+| `system-001` System states | 404, 500, maintenance, offline, empty, loading, and access denied | Calm branded fallback, purposeful recovery motion, static fallback for all effects | Retry, go home, report issue, reconnect, cached content, keyboard recovery |
+
+### Prototype Acceptance Criteria
+
+- All page IDs in the breakdown exist in the prototype navigation or documented flow.
+- Each page has desktop, tablet, and mobile states plus loading, empty, error, success, and permission/offline states where applicable.
+- Every listed interaction is demonstrable with fixture data and has a visible state transition.
+- Motion and 3D have static and reduced-motion fallbacks; no critical information depends on animation or WebGL.
+- Keyboard, focus, contrast, touch target, and semantic HTML checks pass for every page.
+- The Expert Reviewer and Tech Critic record `approved` before the pattern enters the monorepo UI package.
+- Every clickable element passes the Global Click Feedback Contract, including visible press feedback and reduced-motion behavior.
+- Prototype review evidence includes screenshots or preview URL, interaction checklist, accessibility findings, performance notes, owner, and next review date.
+
+### Prototype-to-Monorepo Handoff
+
+After visual approval, the Builder creates a translation map from prototype primitives to production components. The handoff must identify tokens, components, page templates, responsive rules, motion presets, 3D boundaries, accessibility behavior, and fixture-to-API data contracts. The prototype remains available as a visual reference but is not treated as the production source of truth.
 
 ---
 
@@ -555,6 +690,16 @@ online-ticket-no-docker/
 | **Validation** | Zod | Latest | Schema validation |
 | **Icons** | Lucide React | Latest | Icon library |
 | **UI Components** | shadcn/ui | Latest | Pre-built components |
+
+### Visual Prototype Stack
+| Layer | Technology | Version | Purpose |
+|---|---|---|---|
+| **Markup** | Semantic HTML | HTML Living Standard | Standalone page structure and accessibility baseline |
+| **Styling** | CSS custom properties + CSS modules/files | Current browser baseline | Design tokens, responsive layout, states, and fallback styling |
+| **Interaction** | Browser JavaScript modules | Current browser baseline | Fixture-only navigation, forms, dialogs, filters, and state transitions |
+| **Motion** | CSS transitions/keyframes with optional Motion library reference | To be locked | Page entrance, feedback, and reduced-motion-aware transitions |
+| **3D enhancement** | CSS 3D or Three.js reference scene | To be locked | Purposeful event/ticket perspective with static fallback |
+| **Validation** | Playwright + axe/Lighthouse checks | To be locked | Responsive, accessibility, interaction, and performance evidence |
 
 ### Backend Stack
 | Layer | Technology | Version | Purpose |
@@ -1426,12 +1571,14 @@ buckets:
 #### Q4 2026 - Foundation & Setup (Months 1-3)
 - [x] Project initialization & monorepo setup
 - [x] Database schema design & implementation
+- [ ] Standalone HTML visual prototype for every MVP page
+- [ ] Page-by-page design review and approval gate
 - [ ] Authentication system (Supabase Auth)
 - [ ] API scaffolding & documentation
 - [ ] UI component library setup
 - [ ] Development environment setup
 
-**Deliverable**: Foundation complete, API skeleton ready
+**Deliverable**: Approved visual prototype, design-to-component translation map, and API skeleton ready
 
 #### Q1 2027 - MVP Features (Months 4-6)
 - [ ] User registration & profile management
@@ -1538,6 +1685,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 |---------|------|--------|---------|
 | 1.0 | 2026-09-15 | vergenscande | Initial PRD creation |
 | 1.2 | 2026-09-15 | vergenscande | Added agentic decision authority, approval gates, shared-resource locking, fail-graceful contract, logging governance, and accountable risk tracking |
+| 1.3 | 2026-09-15 | vergenscande | Added HTML-first visual prototype phase, page-by-page design breakdown, motion/3D interaction rules, and prototype-to-monorepo approval gate |
 
 ---
 
