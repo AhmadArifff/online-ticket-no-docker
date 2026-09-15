@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>Checkout / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/checkout.css">
+</head>
+<body class="checkout-body">
+  <a class="skip-link" href="#checkout-main">Skip to checkout</a>
+  <header class="site-header checkout-header"><a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a><div class="checkout-secure"><span class="secure-lock">&#128274;</span> Secure checkout</div><a class="text-link" href="event-detail.html">Back to event <span aria-hidden="true">&#8599;</span></a></header>
+  <main id="checkout-main" class="checkout-main">
+    <div class="checkout-progress" aria-label="Checkout progress"><span class="progress-step progress-active"><i>1</i> Your details</span><span class="progress-line"></span><span class="progress-step"><i>2</i> Payment</span><span class="progress-line"></span><span class="progress-step"><i>3</i> Confirmation</span></div>
+    <section class="checkout-layout">
+      <div class="checkout-form-column">
+        <div class="checkout-heading"><p class="eyebrow">Night Market Radio · 24 Sep 2026</p><h1>Almost<br><em>there.</em></h1><p>Tell us where to send your ticket. We will keep it simple.</p></div>
+        <form class="checkout-form" data-checkout-form novalidate>
+          <fieldset class="checkout-section"><legend><span>01</span> Your details</legend><div class="field-grid"><div class="form-field"><label for="checkout-name">Full name</label><input id="checkout-name" name="name" type="text" placeholder="Vergenscande" required><small class="field-error" data-error="name"></small></div><div class="form-field"><label for="checkout-email">Email address</label><input id="checkout-email" name="email" type="email" placeholder="you@example.com" required><small class="field-error" data-error="email"></small></div></div></fieldset>
+          <fieldset class="checkout-section"><legend><span>02</span> Payment method</legend><div class="payment-methods"><button class="payment-method payment-method-active" type="button" data-payment-method="card" aria-pressed="true"><span class="method-icon">▣</span><span><strong>Card</strong><small>Visa, Mastercard, JCB</small></span><i></i></button><button class="payment-method" type="button" data-payment-method="wallet" aria-pressed="false"><span class="method-icon">◈</span><span><strong>Digital wallet</strong><small>GoPay, OVO, DANA</small></span><i></i></button></div><div class="card-preview"><span>Card details will be collected securely at the next step.</span><b>STRIPE</b></div></fieldset>
+          <fieldset class="checkout-section"><legend><span>03</span> Your agreement</legend><label class="check-row agreement-row"><input type="checkbox" name="terms" required><span>I agree to the event terms, refund policy, and Gather's privacy policy.</span></label><small class="field-error" data-error="terms"></small></fieldset>
+          <p class="checkout-status" role="status" data-checkout-status></p>
+          <button class="button button-dark checkout-submit" type="submit" data-checkout-submit><span>Continue to payment</span><span aria-hidden="true">&#8594;</span></button>
+        </form>
+      </div>
+      <aside class="order-summary" aria-labelledby="summary-title"><div class="summary-top"><p class="eyebrow">Your order</p><span class="summary-live"><i></i> Reserved for <strong data-countdown>09:42</strong></span></div><div class="summary-event"><div class="summary-poster">NMR</div><div><h2 id="summary-title">Night Market Radio</h2><p>Thu, 24 Sep · M Bloc Space</p></div></div><div class="summary-ticket"><div><strong>Supporter</strong><span>Access + good karma</span></div><div class="summary-quantity"><button type="button" data-order-quantity="decrease" aria-label="Decrease order quantity">−</button><b data-order-quantity-value>2</b><button type="button" data-order-quantity="increase" aria-label="Increase order quantity">+</button></div></div><div class="voucher-row"><input type="text" data-voucher placeholder="Have a voucher?"><button type="button" data-apply-voucher>Apply</button></div><p class="voucher-message" data-voucher-message></p><div class="summary-lines"><div><span>2 × Supporter</span><span data-subtotal>Rp900k</span></div><div><span>Service fee</span><span data-fee>Rp27k</span></div><div class="summary-total"><strong>Total</strong><strong data-summary-total>Rp927k</strong></div></div><p class="summary-note">Your ticket will be sent to your email after payment is confirmed.</p></aside>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/checkout.js"></script>
+</body>
+</html>

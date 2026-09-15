@@ -79,6 +79,6 @@ document.querySelector('[data-purchase]')?.addEventListener('click', (event) => 
   setTimeout(() => {
     button.classList.remove('is-pending');
     button.innerHTML = '<span>Continue to checkout</span><span aria-hidden="true">&#8594;</span>';
-    showToast('Checkout preview ready');
+    window.location.href = 'checkout.html';
   }, 850);
 });
