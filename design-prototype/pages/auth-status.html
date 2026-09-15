@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>Verify account / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/auth.css">
+  <link rel="stylesheet" href="../styles/auth-status.css">
+</head>
+<body class="auth-body">
+  <a class="skip-link" href="#status-main">Skip to account status</a>
+  <header class="site-header auth-header"><a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a><a class="text-link" href="auth.html">Back to sign in <span aria-hidden="true">&#8599;</span></a></header>
+  <main id="status-main" class="status-main">
+    <section class="status-visual" aria-hidden="true"><div class="status-sun"></div><div class="status-envelope"><span>GATHER</span><strong>CHECK<br>YOUR<br>INBOX</strong><small>VERIFY / 01</small></div><div class="status-stamp">GOOD<br>TO GO</div></section>
+    <section class="status-panel" aria-labelledby="status-title">
+      <div class="status-heading"><p class="eyebrow">One small step</p><h1 id="status-title">Check your<br><em>inbox.</em></h1><p>We sent a verification link to <strong>you@example.com</strong>. It expires in 24 hours.</p></div>
+      <div class="status-mode" role="tablist" aria-label="Account recovery"><button class="status-mode-button status-mode-active" type="button" role="tab" aria-selected="true" data-status-mode="verify">Email verification</button><button class="status-mode-button" type="button" role="tab" aria-selected="false" data-status-mode="reset">Reset password</button></div>
+      <div class="status-view" data-status-view="verify"><div class="status-icon status-icon-mail">@</div><h2>Almost there.</h2><p>Open the link in your email to confirm your account and start finding good rooms.</p><button class="button button-dark status-action" type="button" data-resend>Resend email <span aria-hidden="true">&#8594;</span></button><p class="status-note" data-resend-note>Didn't get it? Check spam, or resend after a moment.</p></div>
+      <div class="status-view" data-status-view="reset" hidden><h2>Make a new password.</h2><form class="reset-form" data-reset-form novalidate><div class="form-field"><label for="reset-email">Email address</label><input id="reset-email" type="email" value="you@example.com" required><small class="field-error" data-reset-error></small></div><button class="button button-dark status-action" type="submit">Send reset link <span aria-hidden="true">&#8594;</span></button><p class="status-note" data-reset-note></p></form></div>
+      <p class="status-footer"><a class="text-link" href="auth.html">Use a different email</a> <span>·</span> <a class="text-link" href="events.html">Browse without signing in</a></p>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/auth-status.js"></script>
+</body>
+</html>

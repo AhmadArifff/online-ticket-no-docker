@@ -52,7 +52,7 @@ document.querySelector('[data-auth-form]')?.addEventListener('submit', (event) =
   event.preventDefault();
   clearErrors();
   const form = event.currentTarget;
-  const signup = !document.querySelector('[data-auth-mode].switch-active').dataset.authMode || document.querySelector('[data-auth-mode].switch-active').dataset.authMode === 'signup';
+  const signup = document.querySelector('[data-auth-mode].switch-active').dataset.authMode === 'signup';
   const email = form.elements.email.value.trim();
   const password = form.elements.password.value;
   let valid = true;
