@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.3
-**Version**: 1.3
-**Last Updated**: 2026-09-15  
+**Status**: Rework Required - Agentic Alignment v1.4
+**Version**: 1.4
+**Last Updated**: 2026-09-16
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
 
@@ -488,6 +488,37 @@ Each page below requires a standalone prototype state, responsive layout, intera
 - The Expert Reviewer and Tech Critic record `approved` before the pattern enters the monorepo UI package.
 - Every clickable element passes the Global Click Feedback Contract, including visible press feedback and reduced-motion behavior.
 - Prototype review evidence includes screenshots or preview URL, interaction checklist, accessibility findings, performance notes, owner, and next review date.
+
+### Prototype Implementation Tracking
+
+Status is updated together with prototype changes so visual decisions remain traceable.
+
+| Page ID | Current implementation | Remaining prototype work | Evidence / file |
+|---|---|---|---|
+| `home-001` | Partial | Featured carousel, loading, offline state, and complete keyboard review | `design-prototype/index.html` |
+| `event-001` | Partial | Functional pagination, date/price/radius filters, loading, API failure, and map fallback | `design-prototype/pages/events.html` |
+| `event-002` | Partial | Realtime availability fixture, sold-out/expired states, related events, and venue fallback | `design-prototype/pages/event-detail.html` |
+| `auth-001` | Partial | Rate-limit, duplicate-email, recovery, terms validation, and provider state fixtures | `design-prototype/pages/auth.html` |
+| `auth-002` | Partial | Expired/invalid token and completed verification states | `design-prototype/pages/auth-status.html` |
+| `checkout-001` | Partial | Interactive stepper, timeout, locked inventory, and retry states | `design-prototype/pages/checkout.html` |
+| `payment-001` | Partial | Retry/support behavior, webhook-pending detail, and duplicate-request fixture | `design-prototype/pages/payment-result.html` |
+| `ticket-001` | Partial | Refunded/cancelled data, transfer/refund states, and offline transition test | `design-prototype/pages/ticket-wallet.html` |
+| `ticket-002` | Implemented fixture | QR visual review, brightness/zoom/download verification, and invalid/used acceptance evidence | `design-prototype/pages/ticket-detail.html` |
+| `organizer-001` | Pending | Build dashboard fixture and permission/no-data states | Not created |
+| `organizer-002` | Pending | Build editor fixture, unsaved changes, conflict, and autosave failure | Not created |
+| `admin-001` | Pending | Build operations fixture, RBAC denial, confirmation, and audit detail | Not created |
+| `system-001` | Implemented fixture | Connect shared states to page review evidence and keyboard recovery checks | `design-prototype/pages/system-states.html` |
+
+Current prototype verdict: `rework`.
+The prototype must not enter the monorepo UI package until the remaining pages, state coverage, responsive/accessibility evidence, and independent review verdicts are recorded.
+
+### Prototype Visual Change Log
+
+| Date | Change | Reason | Tracking impact |
+|---|---|---|---|
+| 2026-09-16 | Added high-contrast ticket detail surface with QR fixture, zoom, bright scan mode, download, wallet save, and ticket states | Close the broken wallet-to-ticket flow and cover `ticket-002` interaction direction | `ticket-002` moved from pending to implemented fixture |
+| 2026-09-16 | Added system-state gallery for 404, 500, maintenance, offline, loading, empty, and access denied | Establish a shared visual language for recovery and degraded states | `system-001` moved from pending to implemented fixture |
+| 2026-09-16 | Updated prototype README page inventory | Keep implementation status visible beside the prototype | Tracking baseline established |
 
 ### Prototype-to-Monorepo Handoff
 
@@ -1686,8 +1717,9 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 | 1.0 | 2026-09-15 | vergenscande | Initial PRD creation |
 | 1.2 | 2026-09-15 | vergenscande | Added agentic decision authority, approval gates, shared-resource locking, fail-graceful contract, logging governance, and accountable risk tracking |
 | 1.3 | 2026-09-15 | vergenscande | Added HTML-first visual prototype phase, page-by-page design breakdown, motion/3D interaction rules, and prototype-to-monorepo approval gate |
+| 1.4 | 2026-09-16 | vergenscande | Added prototype implementation tracking, visual change log, ticket detail fixture, and system-state fixture |
 
 ---
 
-*Last Updated: 2026-09-15*
+*Last Updated: 2026-09-16*
 *Next Review: 2026-10-15*
