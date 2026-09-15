@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Initial Design (Agentic-Optimized v1.1)  
-**Version**: 1.1  
+**Status**: Rework Required - Agentic Alignment v1.2
+**Version**: 1.2
 **Last Updated**: 2026-09-15  
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -12,19 +12,20 @@
 ## 📋 Table of Contents
 1. [Primary Goal & Constraints](#primary-goal--constraints)
 2. [Agentic Governance Model](#agentic-governance-model)
-3. [Executive Summary](#executive-summary)
-4. [Project Overview](#project-overview)
-5. [Technical Architecture](#technical-architecture)
-6. [Monorepo Structure](#monorepo-structure)
-7. [Feature Requirements (OODA-Aligned)](#feature-requirements-ooda-aligned)
-8. [Technology Stack](#technology-stack)
-9. [Deployment Strategy](#deployment-strategy)
-10. [Database Schema](#database-schema)
-11. [Concurrency & Atomic Locking Strategy](#concurrency--atomic-locking-strategy)
-12. [Error Handling & Structured Logging](#error-handling--structured-logging)
-13. [Tech Critic Review (Assumptions & Risks)](#tech-critic-review-assumptions--risks)
-14. [Security Considerations](#security-considerations)
-15. [Development Roadmap](#development-roadmap)
+3. [Decision Authority & Approval Gates](#decision-authority--approval-gates)
+4. [Executive Summary](#executive-summary)
+5. [Project Overview](#project-overview)
+6. [Technical Architecture](#technical-architecture)
+7. [Monorepo Structure](#monorepo-structure)
+8. [Feature Requirements (OODA-Aligned)](#feature-requirements-ooda-aligned)
+9. [Technology Stack](#technology-stack)
+10. [Deployment Strategy](#deployment-strategy)
+11. [Database Schema](#database-schema)
+12. [Concurrency & Atomic Locking Strategy](#concurrency--atomic-locking-strategy)
+13. [Error Handling & Structured Logging](#error-handling--structured-logging)
+14. [Tech Critic Review (Assumptions & Risks)](#tech-critic-review-assumptions--risks)
+15. [Security Considerations](#security-considerations)
+16. [Development Roadmap](#development-roadmap)
 
 ---
 
@@ -91,6 +92,67 @@ Issues:
 Fix By: [Date]
 ```
 
+### OODA Execution Contract
+
+Every feature and architectural decision follows this sequence:
+
+1. **Observe**: record requirements, dependencies, evidence, and open assumptions.
+2. **Orient**: identify security, concurrency, performance, and product constraints.
+3. **Decide**: define the smallest implementation, acceptance criteria, owner, and reviewer.
+4. **Act**: implement on a feature branch, run focused checks, and submit evidence for independent review.
+
+The Builder cannot approve their own implementation. A feature is not complete until the required reviewer verdict is recorded as `approved`.
+
+### Review Evidence Contract
+
+Each review must include:
+
+| Field | Requirement |
+|---|---|
+| `scope` | Feature, decision, or risk being reviewed |
+| `evidence` | Test output, load-test report, security result, or deployment preview |
+| `findings` | Specific defects, assumptions, and residual risks |
+| `verdict` | Exactly one of `approved`, `rework`, `blocked-escalate` |
+| `owner` | Person responsible for resolving `rework` findings |
+| `next_review` | Trigger or date for re-review |
+
+## Decision Authority & Approval Gates
+
+### Verdict Authority
+
+| Verdict | Authority | Required action | SLA |
+|---|---|---|---|
+| `approved` | Assigned independent reviewer | Allow the dependent work to proceed | Within 2 business days |
+| `rework` | Reviewer who raised the finding | Builder fixes the named findings and resubmits evidence | Before merge |
+| `blocked-escalate` | Expert Reviewer / project owner | Stop dependent work and decide mitigation, scope change, or constraint change | Within 24 hours |
+
+The **Expert Reviewer (user/project owner)** is the final authority for blocked architectural, security, deployment, and scope decisions. A blocked verdict may only be cleared by a new recorded verdict after the mitigation evidence is reviewed. Locked constraints cannot be changed by the Builder or Tech Critic.
+
+### Approval Gates
+
+| Gate | Required reviewers | Evidence before approval |
+|---|---|---|
+| Architecture and stack | Expert Reviewer + Tech Critic | Decision record, dependency/version validation, threat and scalability assumptions |
+| Database and RLS | Backend Builder + Security Reviewer + Expert Reviewer | Migration review, RLS tests, rollback plan |
+| Payment and inventory | Backend Builder + QA + Security Reviewer | Idempotency, webhook retry/reconciliation, concurrency report with zero overbooking |
+| Production deployment | QA + Security Reviewer + Expert Reviewer | CI result, smoke test, observability check, rollback rehearsal |
+
+If a named reviewer is unavailable, the gate is `blocked-escalate`; the Builder must not self-approve the missing review.
+
+### Decisions Still Requiring Explicit Lock
+
+The following alternatives are proposals, not implementation permissions, until the Expert Reviewer records an `approved` decision:
+
+- Authentication: Supabase Auth or NextAuth.js
+- State management: Zustand or Redux Toolkit
+- Data access: Supabase Client or Prisma
+- Queue: Bull Queue or pg-boss
+- Logging: Pino or Winston
+- Email provider: SendGrid or Resend
+- Redis-compatible lock provider and production plan
+
+Until each choice is locked, implementation must not introduce both alternatives or silently choose one.
+
 ---
 
 ## Executive Summary
@@ -138,7 +200,7 @@ Fix By: [Date]
 ┌─────────────────────────────────────────────┐
 │         Client Layer (PWA)                   │
 │  ┌──────────────────────────────────────┐   │
-│  │  Web UI (Next.js/Vue)                │   │
+│  │  Web UI (Next.js App Router)         │   │
 │  │  Service Worker (Offline Support)    │   │
 │  │  Local Cache (IndexedDB/LocalStorage)│   │
 │  └──────────────────────────────────────┘   │
@@ -148,7 +210,7 @@ Fix By: [Date]
 │      API Gateway & Middleware                │
 │  ┌──────────────────────────────────────┐   │
 │  │  Vercel Edge Functions               │   │
-│  │  Authentication (NextAuth.js/Supabase)   │
+│  │  Authentication (approved provider)  │   │
 │  │  Rate Limiting & DDoS Protection    │   │
 │  └──────────────────────────────────────┘   │
 └──────────────────┬──────────────────────────┘
@@ -747,6 +809,29 @@ async function purchaseTicket(
 | **Fallback** | If lock fails, return clear error | "Inventory temporarily unavailable" |
 | **Lock Release** | Automatic after payment OR TTL expiry | Both via Redis expiry + explicit delete |
 
+### Shared Resource Locking Matrix
+
+Redis is a coordination mechanism, not the source of truth. Every mutation must also be protected by a database transaction or an atomic conditional update. Lock release must use an ownership token and compare-and-delete operation so an expired lock cannot be deleted by a later request.
+
+| Resource | Race condition | Required control | Verification |
+|---|---|---|---|
+| Ticket inventory | Concurrent purchases exceed stock | Redis TTL lock + conditional DB decrement in transaction | 1,000 concurrent purchase test; zero negative inventory and zero overbooking |
+| Reservation expiry | Expiry job competes with payment confirmation | Reservation state transition with version/idempotency check | Replayed expiry and payment events produce one final state |
+| Payment/order creation | Duplicate checkout or webhook delivery | `Idempotency-Key` unique constraint + webhook event unique constraint | Duplicate requests return the original result |
+| Invoice sequence | Concurrent invoice generation uses the same number | Database sequence or transactional counter, never application-side increment | Parallel generation produces unique sequential identifiers |
+| Promo redemption | Multiple users consume the same limited allocation | Atomic conditional decrement inside a transaction | Redemption count never exceeds configured limit |
+| Ticket check-in | The same ticket is scanned concurrently | Atomic `valid -> used` transition with conditional update | At most one successful check-in per ticket |
+
+Profile edits do not require a distributed lock; they require optimistic versioning and conflict detection because they are not a scarce shared inventory resource.
+
+### Lock Safety Rules
+
+- Lock TTL, retry count, and timeout are configuration values, validated at startup.
+- A lock failure returns a typed `LOCK_UNAVAILABLE` result; it must not throw through the API boundary.
+- Database rollback is only performed when the transaction outcome is known. If the outcome is uncertain, reconciliation resolves inventory from the durable order and reservation state.
+- Lock release is attempted in `finally`, logged, and retried safely; release failure must not hide the original error.
+- Lock keys must use a stable resource identifier and must never contain PII.
+
 #### 2. Payment Processing Idempotency
 **Problem**: User clicks "Pay" twice, creates 2 orders
 
@@ -865,6 +950,37 @@ logger.info({
 console.log(`User ${user.id} signed up`);  // Not JSON, hard to query
 ```
 
+### Logging Governance
+
+All logs must follow these controls:
+
+| Control | Requirement |
+|---|---|
+| PII masking | Mask email, phone, address, tokens, authorization headers, and payment identifiers. Never log passwords, secrets, card data, or raw webhook signatures. |
+| Retention | `info` and `debug` logs: 30 days; `warn` and `error` logs: 90 days, subject to the approved privacy policy. |
+| Sampling | 100% of security, payment, inventory, and error events; configurable sampling for high-volume informational events. |
+| Correlation | Every request and background job carries `request_id`, `operation_id`, and, where applicable, `user_id` or `order_id`. |
+| Alerting | Alert on payment reconciliation failures, repeated lock failures, authentication abuse, and error-rate thresholds defined in `system_config`. |
+| Access | Production logs are restricted by role and audit logged. |
+
+The logger must sanitize arbitrary error objects before serialization. Client responses must expose a stable `errorCode` and `errorId`, never stack traces or provider secrets.
+
+### Fail-Gracefully Contract
+
+The Result pattern applies to service, database, API, middleware, and external-provider boundaries:
+
+- Validate inputs with guard clauses before network or database work.
+- Apply a bounded timeout to every external call; the value is configuration-driven.
+- Retry only transient failures with capped exponential backoff and an idempotency key where supported.
+- After the retry budget is exhausted, return a typed failure and structured log; never use an empty `catch` block.
+- Use a circuit breaker or provider health state for repeatedly failing dependencies.
+- Provide a safe degraded response where possible, such as cached public event data; never serve stale authorization, inventory, payment, or ticket-validation decisions.
+- Webhook handlers must acknowledge only after durable idempotent persistence, or return a retryable failure.
+
+### Guard-Clause Enforcement
+
+Every service and route handler must reject invalid authentication, authorization, input, configuration, and resource state at the top of the function. Pull requests must include a guard-clause review item, and linting/type checks must pass before an independent reviewer evaluates behavior.
+
 ### Zero Hardcoding Rules
 
 **All configuration must come from:**
@@ -903,6 +1019,8 @@ INSERT INTO system_config (key, value) VALUES
 ('admin_role_name', '{"value": "admin"}'),
 ('max_concurrent_reservations', '{"value": 5}');
 ```
+
+The `system_config` table is the source of truth for business-tunable values such as pagination limits, password and token expiry, rate limits, reservation TTL, lock retry policy, cache TTL, upload limits, log sampling, and alert thresholds. Secrets and deployment-specific values remain in environment variables. Configuration is loaded through a typed validator at startup; missing or invalid required configuration fails deployment, while optional features fail closed.
 
 ### Global Error Handler
 
@@ -975,23 +1093,23 @@ try {
    - **Impact**: Revenue loss, customer refunds, reputation damage
    - **Probability**: HIGH (multiple concurrent purchases)
    - **Mitigation**: 
-     - ✅ Implemented: Atomic locking on inventory
-     - ⏳ TODO: Load test with 1000 concurrent users
-     - ⏳ TODO: Integration test with Stripe webhook delays
+    - ✅ Specified: Atomic locking on inventory
+    - ⏳ Required before payment gate: Load test with 1000 concurrent users
+    - ⏳ Required before payment gate: Integration test with Stripe webhook delays
 
 2. **Service Worker Offline Data Corruption**
    - **Impact**: Users see expired/invalid tickets offline
    - **Probability**: MEDIUM
    - **Mitigation**:
-     - ✅ Implemented: Versioning on cached data
-     - ⏳ TODO: Implement IndexedDB integrity checks
+    - ✅ Specified: Versioning on cached data
+    - ⏳ Required before PWA gate: Implement IndexedDB integrity checks
 
 3. **Payment Webhook Failure → Tickets Not Created**
    - **Impact**: Customer paid but no ticket, refund required
    - **Probability**: LOW (Stripe is reliable) but IMPACT is HIGH
    - **Mitigation**:
-     - ✅ Implemented: 3-retry exponential backoff
-     - ⏳ TODO: Manual reconciliation job (compare payments vs tickets)
+    - ✅ Specified: 3-retry exponential backoff
+    - ⏳ Required before payment gate: Manual reconciliation job (compare payments vs tickets)
 
 #### 🟠 **HIGH RISKS**
 
@@ -999,15 +1117,15 @@ try {
    - **Impact**: Slow checkout during popular event sale
    - **Probability**: MEDIUM
    - **Mitigation**:
-     - ⏳ TODO: Pre-warm functions 5 min before event sale
-     - ⏳ TODO: Use Vercel Edge Functions for static routes
+    - ⏳ Required before production gate: Pre-warm functions 5 min before event sale
+    - ⏳ Required before production gate: Use Vercel Edge Functions for static routes
 
 5. **Real-time Availability Not Reflected Immediately**
    - **Impact**: Users buy "sold out" tickets thinking available
    - **Probability**: LOW (WebSocket < 1 sec)
    - **Mitigation**:
-     - ✅ Implemented: Realtime < 1 second SLA
-     - ⏳ TODO: Client-side optimistic locking UI
+    - ✅ Specified: Realtime < 1 second SLA
+    - ⏳ Required before booking gate: Client-side optimistic locking UI
 
 #### 🟡 **MEDIUM RISKS**
 
@@ -1015,15 +1133,15 @@ try {
    - **Impact**: Timeouts during traffic spike
    - **Probability**: MEDIUM
    - **Mitigation**:
-     - ✅ Implemented: Supabase managed connection pooling
-     - ⏳ TODO: Monitor connection count, alert at 80%
+    - ✅ Specified: Supabase managed connection pooling
+    - ⏳ Required before production gate: Monitor connection count, alert at 80%
 
 7. **Supabase Storage Rate Limiting on Avatar Upload**
    - **Impact**: Slow avatar uploads during onboarding
    - **Probability**: LOW
    - **Mitigation**:
-     - ✅ Implemented: Client-side image resize before upload
-     - ⏳ TODO: Implement upload queue with retry
+    - ✅ Specified: Client-side image resize before upload
+    - ⏳ Required before production gate: Implement upload queue with retry
 
 ### Red Flags Requiring Security Review
 
@@ -1031,6 +1149,20 @@ try {
 - [ ] **Before Real-time Launch**: Verify WebSocket doesn't leak user data via subscriptions
 - [ ] **Before Production**: Penetration testing for authentication bypass
 - [ ] **Before Admin Features**: Role-based access control audit (no privilege escalation)
+
+### Risk Mitigation Ownership
+
+Every mitigation must have an owner, deadline, evidence, and independent reviewer. An unassigned `TODO` is not considered a mitigation.
+
+| Risk | Mitigation owner | Deadline | Verification evidence | Reviewer |
+|---|---|---|---|---|
+| Overbooking and inventory race | Backend Builder | Before payment gate | Concurrency report with zero overbooking | QA Engineer + Tech Critic |
+| Payment webhook failure | Backend Builder | Before payment gate | Idempotency and reconciliation test report | QA Engineer + Security Engineer |
+| Offline ticket staleness | Frontend Builder | Before PWA gate | Offline/online state-transition E2E report | QA Engineer |
+| Cold-start latency | DevOps/Builder | Before production gate | Load test and Core Web Vitals report | Expert Reviewer |
+| RLS or RBAC bypass | Security Engineer | Before production gate | RLS policy test and threat-model sign-off | Expert Reviewer |
+
+Any missed deadline or failed verification changes the related verdict to `blocked-escalate` until the owner supplies a new mitigation plan.
 
 ---
 
@@ -1104,7 +1236,7 @@ CREATE TABLE events (
   latitude DECIMAL(10, 8),
   longitude DECIMAL(11, 8),
   cover_image_url VARCHAR(500),
-  status ENUM ('draft', 'published', 'ongoing', 'completed', 'cancelled') DEFAULT 'draft',
+  status VARCHAR(50) NOT NULL, -- Resolved through status_configs for entity_type='event'
   total_capacity INTEGER,
   available_seats INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -1144,7 +1276,7 @@ CREATE TABLE tickets (
   order_id UUID NOT NULL REFERENCES orders(id),
   ticket_number VARCHAR(50) UNIQUE NOT NULL,
   qr_code VARCHAR(500),
-  status ENUM ('valid', 'used', 'refunded', 'cancelled') DEFAULT 'valid',
+  status VARCHAR(50) NOT NULL, -- Resolved through status_configs for entity_type='ticket'
   seat_number VARCHAR(50),
   checked_in_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -1162,7 +1294,7 @@ CREATE TABLE orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id),
   total_amount DECIMAL(10, 2) NOT NULL,
-  status ENUM ('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
+  status VARCHAR(50) NOT NULL, -- Resolved through status_configs for entity_type='order'
   payment_method VARCHAR(100),
   payment_id VARCHAR(255),
   invoice_number VARCHAR(50) UNIQUE,
@@ -1184,7 +1316,7 @@ CREATE TABLE notifications (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
-  type ENUM ('order', 'event', 'promotion', 'system') DEFAULT 'system',
+  type VARCHAR(50) NOT NULL, -- Resolved through notification configuration
   data JSONB,
   is_read BOOLEAN DEFAULT FALSE,
   read_at TIMESTAMP,
@@ -1394,7 +1526,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 - [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
 
 ### C. Team & Contacts
-- **Project Lead**: Ahmad Arif
+- **Project Lead**: vergenscande
 - **Tech Lead**: [To be assigned]
 - **DevOps**: [To be assigned]
 - **QA Lead**: [To be assigned]
@@ -1404,7 +1536,8 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 **Document Version History**
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-09-15 | Ahmad Arif | Initial PRD creation |
+| 1.0 | 2026-09-15 | vergenscande | Initial PRD creation |
+| 1.2 | 2026-09-15 | vergenscande | Added agentic decision authority, approval gates, shared-resource locking, fail-graceful contract, logging governance, and accountable risk tracking |
 
 ---
 
