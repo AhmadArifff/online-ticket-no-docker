@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>Sign in / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/auth.css">
+</head>
+<body class="auth-body">
+  <a class="skip-link" href="#auth-main">Skip to authentication</a>
+  <header class="site-header auth-header"><a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a><a class="text-link" href="events.html">Back to discover <span aria-hidden="true">&#8599;</span></a></header>
+  <main id="auth-main" class="auth-main">
+    <section class="auth-visual" aria-label="Gather membership preview"><div class="auth-orbit auth-orbit-one" aria-hidden="true"></div><div class="auth-orbit auth-orbit-two" aria-hidden="true"></div><div class="auth-ticket" aria-hidden="true"><span>MEMBER / 01</span><strong>GOOD<br>ROOMS<br>AWAIT</strong><small>GATHER CLUB</small></div><p>Come for the event.<br>Stay for the people.</p></section>
+    <section class="auth-panel" aria-labelledby="auth-title">
+      <div class="auth-heading"><p class="eyebrow">A good place to start</p><h1 id="auth-title">Welcome<br><em>back.</em></h1><p>Keep your plans in one place, and find the next one.</p></div>
+      <div class="auth-switch" role="tablist" aria-label="Authentication mode"><button class="auth-switch-button switch-active" type="button" role="tab" aria-selected="true" data-auth-mode="login">Sign in</button><button class="auth-switch-button" type="button" role="tab" aria-selected="false" data-auth-mode="signup">Create account</button></div>
+      <form class="auth-form" data-auth-form novalidate>
+        <div class="form-field signup-only" hidden><label for="full-name">Full name</label><input id="full-name" name="name" type="text" autocomplete="name" placeholder="Vergenscande"><small class="field-error" data-error="name"></small></div>
+        <div class="form-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><small class="field-error" data-error="email"></small></div>
+        <div class="form-field"><div class="field-label-row"><label for="password">Password</label><a href="auth-status.html#reset" class="text-link form-link">Forgot password?</a></div><div class="password-wrap"><input id="password" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required minlength="8"><button class="password-toggle" type="button" data-password-toggle aria-label="Show password">Show</button></div><small class="field-error" data-error="password"></small></div>
+        <label class="check-row signup-only" hidden><input type="checkbox" name="terms"><span>I agree to the terms and privacy policy.</span></label>
+        <button class="button button-dark auth-submit" type="submit" data-auth-submit><span data-submit-label>Sign in</span><span aria-hidden="true">&#8594;</span></button>
+        <p class="form-status" role="status" data-form-status></p>
+      </form>
+      <div class="auth-divider"><span>or continue with</span></div>
+      <div class="provider-grid"><button class="provider-button" type="button" data-toast="Google login preview"><b>G</b> Google</button><button class="provider-button" type="button" data-toast="GitHub login preview"><b>⌘</b> GitHub</button></div>
+      <p class="auth-footnote">By continuing, you agree to gather's terms. Your data stays yours.</p>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/auth.js"></script>
+</body>
+</html>
