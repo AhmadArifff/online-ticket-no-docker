@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.5
-**Version**: 1.5
+**Status**: Rework Required - Agentic Alignment v1.6
+**Version**: 1.6
 **Last Updated**: 2026-09-16
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -506,11 +506,27 @@ Status is updated together with prototype changes so visual decisions remain tra
 | `ticket-002` | Implemented fixture | QR visual review, brightness/zoom/download verification, and invalid/used acceptance evidence | `design-prototype/pages/ticket-detail.html` |
 | `organizer-001` | Implemented fixture | Permission/no-data evidence and independent review remain | `design-prototype/pages/organizer-dashboard.html` |
 | `organizer-002` | Implemented fixture | Conflict and autosave-failure evidence remain | `design-prototype/pages/organizer-editor.html` |
-| `admin-001` | Pending | Build operations fixture, RBAC denial, confirmation, and audit detail | Not created |
+| `admin-001` | Implemented fixture | Independent RBAC, confirmation, and audit review remain | `design-prototype/pages/admin-operations.html` |
 | `system-001` | Implemented fixture | Connect shared states to page review evidence and keyboard recovery checks | `design-prototype/pages/system-states.html` |
 
 Current prototype verdict: `rework`.
 The prototype must not enter the monorepo UI package until the remaining pages, state coverage, responsive/accessibility evidence, and independent review verdicts are recorded.
+
+### Prototype Integration Map
+
+The standalone prototype is navigable through `design-prototype/pages/prototype-hub.html`. The following fixture routes and transitions are the reference contract before production components are created:
+
+| Flow | Route sequence | Integration purpose |
+|---|---|---|
+| Public discovery | `index.html -> pages/events.html -> pages/event-detail.html` | Discover, filter, inspect, and select an event |
+| Purchase | `event-detail.html -> pages/checkout.html -> pages/payment-result.html?state=pending` | Select ticket, validate order, and review payment state |
+| Ticket ownership | `payment-result.html?state=success -> pages/ticket-wallet.html -> pages/ticket-detail.html` | Move from confirmed payment to wallet and QR entry pass |
+| Account recovery | `pages/auth.html -> pages/auth-status.html` | Sign in, signup, verify email, and reset password |
+| Organizer | `pages/organizer-dashboard.html <-> pages/organizer-editor.html` | Monitor events, create/edit, autosave, and publish |
+| Admin | `pages/admin-operations.html -> pages/system-states.html` | Review operations, permission signals, and degraded states |
+| Recovery | Any state failure -> `pages/system-states.html -> pages/prototype-hub.html` | Return to a known route without dead ends |
+
+Every production route must preserve these transitions with real auth, API, and database contracts. A page is not integrated when it only renders in isolation; its primary, secondary, back, error, and recovery actions must resolve to a documented route or an explicit `blocked-escalate` review item.
 
 ### Prototype Visual Change Log
 
@@ -1719,6 +1735,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 | 1.3 | 2026-09-15 | vergenscande | Added HTML-first visual prototype phase, page-by-page design breakdown, motion/3D interaction rules, and prototype-to-monorepo approval gate |
 | 1.4 | 2026-09-16 | vergenscande | Added prototype implementation tracking, visual change log, ticket detail fixture, and system-state fixture |
 | 1.5 | 2026-09-16 | vergenscande | Added organizer dashboard and event editor fixtures with metrics, live preview, autosave, ticket tiers, validation, and publish guard |
+| 1.6 | 2026-09-16 | vergenscande | Added admin operations fixture, prototype hub, cross-page integration map, and recovery route contract |
 
 ---
 

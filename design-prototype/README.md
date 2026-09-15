@@ -21,6 +21,8 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 - System state gallery: 404, 500, maintenance, offline, loading, empty, and access denied
 - Organizer dashboard with sales metrics, event switcher, chart, activity, and export preview
 - Event editor with live preview, autosave state, ticket type editor, validation, and publish guard
+- Admin operations with orders, users/audit tabs, filters, permission watch, and runtime toggles
+- Prototype Hub with the complete route map and customer, organizer, admin, and recovery flows
 
 ## Prototype pages
 
@@ -38,6 +40,11 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 | System states | `pages/system-states.html` | Implemented fixture |
 | Organizer dashboard | `pages/organizer-dashboard.html` | Implemented fixture |
 | Event editor | `pages/organizer-editor.html` | Implemented fixture |
-| Admin operations | Not created | Pending |
+| Admin operations | `pages/admin-operations.html` | Implemented fixture |
+| Prototype map | `pages/prototype-hub.html` | Integration entry point |
+
+## Integrated review path
+
+Open `pages/prototype-hub.html` to review every fixture route. The customer flow is Home -> Events -> Event detail -> Checkout -> Payment -> Wallet -> QR detail. Organizer, admin, and recovery routes are available from the same map, and `PRD.md` contains the route transition contract.
 
 The prototype remains fixture-only. It has no production authentication, payment provider, Supabase connection, service worker, or API integration.
