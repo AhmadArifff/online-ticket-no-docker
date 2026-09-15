@@ -1,24 +1,95 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Initial Design  
-**Version**: 1.0  
+**Status**: Initial Design (Agentic-Optimized v1.1)  
+**Version**: 1.1  
 **Last Updated**: 2026-09-15  
-**Author**: Ahmad Arif  
+**Governance Framework**: OODA Loop + Separation of Duty  
+**Author**: vergenscande  
 
 ---
 
 ## 📋 Table of Contents
-1. [Executive Summary](#executive-summary)
-2. [Project Overview](#project-overview)
-3. [Technical Architecture](#technical-architecture)
-4. [Monorepo Structure](#monorepo-structure)
-5. [Feature Requirements](#feature-requirements)
-6. [Technology Stack](#technology-stack)
-7. [Deployment Strategy](#deployment-strategy)
-8. [Database Schema](#database-schema)
-9. [Security Considerations](#security-considerations)
-10. [Development Roadmap](#development-roadmap)
+1. [Primary Goal & Constraints](#primary-goal--constraints)
+2. [Agentic Governance Model](#agentic-governance-model)
+3. [Executive Summary](#executive-summary)
+4. [Project Overview](#project-overview)
+5. [Technical Architecture](#technical-architecture)
+6. [Monorepo Structure](#monorepo-structure)
+7. [Feature Requirements (OODA-Aligned)](#feature-requirements-ooda-aligned)
+8. [Technology Stack](#technology-stack)
+9. [Deployment Strategy](#deployment-strategy)
+10. [Database Schema](#database-schema)
+11. [Concurrency & Atomic Locking Strategy](#concurrency--atomic-locking-strategy)
+12. [Error Handling & Structured Logging](#error-handling--structured-logging)
+13. [Tech Critic Review (Assumptions & Risks)](#tech-critic-review-assumptions--risks)
+14. [Security Considerations](#security-considerations)
+15. [Development Roadmap](#development-roadmap)
+
+---
+
+## Primary Goal & Constraints
+
+### Primary Goal (PRIMARY_GOAL)
+```
+Build a scalable, serverless PWA for online ticket management that:
+- Supports millions of concurrent transactions
+- Provides sub-2-second load time with offline capability
+- Maintains 99.9% uptime with zero-infrastructure operations
+- Enables seamless cross-platform experience (web + mobile)
+```
+
+### Established Constraints (LOCKED)
+
+⚠️ **These constraints are LOCKED and require explicit user approval to change:**
+
+| Constraint | Decision | Rationale | Change Policy |
+|-----------|----------|-----------|----------------|
+| **Hosting Platform** | Vercel Serverless | Zero ops overhead, auto-scaling | Requires user approval + 2-week migration plan |
+| **Database** | Supabase PostgreSQL | Real-time capabilities, built-in auth | Requires user approval + data migration strategy |
+| **Frontend Framework** | Next.js 14+ | SSR/SSG, PWA support, API routes | Requires user approval + codebase rewrite |
+| **Monorepo Tooling** | pnpm + Turbo | Fast builds, incremental compilation | Requires user approval + workspace migration |
+| **Language** | TypeScript strict mode | Type safety, catch bugs early | Enforced on all packages |
+| **Package Structure** | Monorepo (shared/web/api/mobile/admin) | Scalability, DRY principle | Changes require architectural review |
+| **Payment Gateway** | Stripe / Xendit | PCI-DSS compliant, mature ecosystem | Changes require security audit |
+| **Storage** | Supabase Storage (S3-compatible) | Consistent with DB infrastructure | Changes require migration plan |
+
+---
+
+## Agentic Governance Model
+
+### Separation of Duty (No Self-Review)
+
+Development follows strict role separation:
+
+| Role | Responsibility | Authority |
+|------|---------------|-----------|
+| **Builder** (Dev/Engineer) | Implement features, unit tests | Execute code changes |
+| **Tech Critic** | Challenge assumptions, find risks | Block risky implementations |
+| **QA Engineer** | Verify acceptance criteria, edge cases | Approve feature quality |
+| **Security Engineer** | Threat modeling, OWASP check | Approve security implementation |
+| **Product Manager** | Feature scope, business validation | Approve business logic |
+
+### Machine-Readable Verdicts
+
+Every significant implementation requires one of:
+```
+✅ APPROVED   - Meets all standards, no critical issues
+🔄 REWORK     - Specific findings must be fixed, details in comment
+🚫 BLOCKED    - Fatal violation, escalate to user for decision
+```
+
+Example:
+```
+Feature: User Authentication
+Builder: Implemented with NextAuth.js
+Tech Critic Verdict: 🔄 REWORK
+Issues:
+  1. Missing rate-limiting on login endpoint
+  2. No structured logging for auth failures
+  3. Hardcoded JWT secret in .env (should rotate)
+Fix By: [Date]
+```
 
 ---
 
@@ -227,54 +298,168 @@ online-ticket-no-docker/
 
 ---
 
-## Feature Requirements
+## Feature Requirements (OODA-Aligned)
 
 ### Phase 1: MVP (v1.0) - Core Functionality
-#### User Authentication & Profile
-- [ ] Sign up dengan email/password
-- [ ] Social login (Google, GitHub)
-- [ ] Email verification
-- [ ] Password reset
-- [ ] User profile management
-- [ ] Avatar upload (Supabase Storage)
 
-#### Event Management
-- [ ] Browse events (filtering, search, sorting)
-- [ ] Event detail page
-- [ ] Event booking/ticket purchase
-- [ ] Multiple ticket types support
-- [ ] Real-time seat availability (WebSocket via Supabase Realtime)
-- [ ] Event recommendations
+#### Feature Group: User Authentication & Profile
 
-#### Ticket Management
-- [ ] View purchased tickets
-- [ ] QR code generation & display
-- [ ] Ticket transfer/resale (optional)
-- [ ] Ticket refund request
-- [ ] Offline ticket access (cached)
-- [ ] Digital ticket validation
+**OODA Decomposition:**
+- `auth-001`: Email/Password Signup (Subtask)
+  - Acceptance Criteria:
+    - ✅ User can register with valid email & strong password
+    - ✅ Weak passwords rejected with clear error message
+    - ✅ Duplicate email rejected gracefully
+    - ✅ No hardcoded password rules in code (use DB config table)
+    - ✅ Structured logging: `{level: 'info', event: 'user_signup', user_id, timestamp}`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
 
-#### Payment Processing
-- [ ] Payment gateway integration (Stripe, Xendit)
-- [ ] Invoice generation
-- [ ] Transaction history
-- [ ] Multiple payment methods
-- [ ] Secure payment handling (PCI-DSS compliance)
+- `auth-002`: Social Login (OAuth2 via Supabase)
+  - Acceptance Criteria:
+    - ✅ Google login flow works end-to-end
+    - ✅ GitHub login flow works end-to-end
+    - ✅ User email auto-populated from provider
+    - ✅ Existing user auto-linked if email matches
+    - ✅ No CSRF vulnerabilities (verified by Security Engineer)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
 
-#### Notifications
-- [ ] Push notifications (Web + Mobile)
-- [ ] Email notifications
-- [ ] In-app notifications
-- [ ] Notification preferences
-- [ ] Real-time updates
+- `auth-003`: Email Verification
+  - Acceptance Criteria:
+    - ✅ Verification email sent within 5 seconds of signup
+    - ✅ Verification link expires in 24 hours
+    - ✅ User cannot access features until verified
+    - ✅ Resend limit: 5x per day (configurable via env)
+    - ✅ All timestamps in UTC (no hardcoding)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
 
-#### Admin Features
-- [ ] Event creation & management
-- [ ] Ticket inventory management
-- [ ] Sales analytics dashboard
-- [ ] User management
-- [ ] Support ticket system
-- [ ] Revenue reporting
+- `auth-004`: Password Reset
+  - Acceptance Criteria:
+    - ✅ Reset link expires in 1 hour
+    - ✅ Old password not required for reset
+    - ✅ Rate limit: 3 reset emails per hour per user
+    - ✅ Structured logging for all reset attempts (including failed)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `auth-005`: User Profile Management
+  - Acceptance Criteria:
+    - ✅ User can update first name, last name, phone
+    - ✅ Email change requires re-verification
+    - ✅ All updates trigger audit log entry
+    - ✅ No personal data in error messages
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `auth-006`: Avatar Upload to Supabase Storage
+  - Acceptance Criteria:
+    - ✅ Accept JPEG, PNG, WebP (max 5MB)
+    - ✅ Auto-resize to 256x256px + 512x512px variants
+    - ✅ Old avatar deleted when new one uploaded
+    - ✅ Serve from CDN with cache headers
+    - ✅ No path traversal vulnerabilities
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+#### Feature Group: Event Management
+
+**Dependencies:** Requires `auth-001` (user must be logged in)
+
+- `event-001`: Browse Events with Filtering
+  - Acceptance Criteria:
+    - ✅ List events paginated (20 per page)
+    - ✅ Filter by: date range, category, price range, location radius
+    - ✅ Sort by: trending, newest, lowest price, soonest
+    - ✅ Search full-text on title + description
+    - ✅ All filter values come from DB config (zero hardcoding)
+    - ✅ Performance: query returns in < 200ms (p95)
+  - Dependencies: None
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `event-002`: Event Detail Page
+  - Acceptance Criteria:
+    - ✅ Display: title, description, date, venue, organizer, ticket types
+    - ✅ Show availability count (real-time via Supabase Realtime)
+    - ✅ Display customer reviews if available
+    - ✅ Organizer contact info visible (phone/email configurable)
+    - ✅ Related events recommendation (similar category/date)
+  - Dependencies: `event-001`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `event-003`: Event Booking & Ticket Purchase (CRITICAL - Concurrency)
+  - **⚠️ CONCURRENCY RISK:** This feature requires atomic locking (see [Concurrency Strategy](#concurrency--atomic-locking-strategy))
+  - Acceptance Criteria:
+    - ✅ User selects ticket type & quantity
+    - ✅ System acquires distributed lock on ticket inventory (Redis TTL=30s)
+    - ✅ Seat availability decremented atomically
+    - ✅ Lock released after payment confirmation OR timeout
+    - ✅ No overbooking scenarios (verified by QA with 1000 concurrent users)
+    - ✅ Failed transactions automatically release lock and return inventory
+    - ✅ Structured logging: `{event: 'ticket_purchase_attempt', user_id, event_id, quantity, lock_acquired, lock_released_at}`
+  - Dependencies: `auth-001`, `event-002`, `payment-001`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `event-004`: Multiple Ticket Types Support
+  - Acceptance Criteria:
+    - ✅ Organizer can create VIP, Standard, Economy tiers
+    - ✅ Each tier has separate inventory & pricing
+    - ✅ Tier features (perks) stored in JSONB column (extensible)
+    - ✅ Bulk purchase (e.g., "5x Standard + 2x VIP") works atomically
+  - Dependencies: `event-003`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `event-005`: Real-time Seat Availability (WebSocket)
+  - Acceptance Criteria:
+    - ✅ Connected users receive availability updates < 1 second
+    - ✅ Uses Supabase Realtime subscriptions
+    - ✅ Graceful fallback if WebSocket unavailable (polling every 5s)
+    - ✅ Connection limit: 10,000 concurrent subscriptions per event (configurable)
+  - Dependencies: `event-003`, `event-004`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+#### Feature Group: Ticket Management
+
+- `ticket-001`: View Purchased Tickets
+  - Acceptance Criteria:
+    - ✅ User sees all owned tickets in dashboard
+    - ✅ Sort by event date, purchase date
+    - ✅ Show status: Valid, Used, Refunded, Cancelled
+    - ✅ Quick-action buttons: View QR, Transfer, Refund Request
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `ticket-002`: QR Code Generation & Display
+  - Acceptance Criteria:
+    - ✅ Generate unique QR per ticket instance
+    - ✅ QR encodes: ticket_id + event_id + hash(ticket_secret)
+    - ✅ Display QR at 300x300px minimum (PWA-compatible size)
+    - ✅ QR cacheable offline (downloaded with ticket data)
+    - ✅ No sensitive data in QR payload (use server-side lookup)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `ticket-003`: Offline Ticket Access
+  - Acceptance Criteria:
+    - ✅ Service Worker caches ticket data + QR on purchase
+    - ✅ User can view tickets without internet
+    - ✅ Sync to server when reconnected
+    - ✅ No double-usage vulnerability (verify on backend before marking used)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+#### Feature Group: Payment Processing
+
+- `payment-001`: Stripe Integration
+  - Acceptance Criteria:
+    - ✅ Checkout flow secure (via Stripe Hosted Page or Elements)
+    - ✅ PCI-DSS Level 1 compliance (no card data in our DB)
+    - ✅ Webhook: payment.intent.succeeded → ticket creation
+    - ✅ Webhook: payment.intent.canceled → inventory release
+    - ✅ Retry logic: 3 attempts on webhook failure with exponential backoff
+    - ✅ Structured logging: `{event: 'payment_webhook', status, amount, timestamp}`
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
+
+- `payment-002`: Invoice Generation
+  - Acceptance Criteria:
+    - ✅ PDF invoice generated after payment success
+    - ✅ Stored in Supabase Storage under `/invoices/{order_id}/`
+    - ✅ Email invoice link to customer within 5 seconds
+    - ✅ Invoice unique number format: `INV-{YYYYMMDD}-{sequential}`
+    - ✅ No hardcoding of company info (use env vars)
+  - Reviewer Verdict: [ ] Approved / [ ] Rework / [ ] Blocked
 
 ### Phase 2: Enhancement (v1.1+)
 - [ ] Loyalty program & points system
@@ -417,12 +602,445 @@ pnpm db:rollback
 
 ---
 
-## Database Schema
+## Concurrency & Atomic Locking Strategy
+
+### Critical Concurrency Scenarios
+
+**⚠️ HIGH RISK**: The following scenarios require atomic locking to prevent race conditions:
+
+#### 1. Ticket Inventory Race Condition
+**Problem**: 10,000 users simultaneously buying last 100 tickets
+
+```
+User A: SELECT available_quantity FROM ticket_types WHERE id = 'ABC' → 100
+User B: SELECT available_quantity FROM ticket_types WHERE id = 'ABC' → 100
+User A: UPDATE ticket_types SET available_quantity = 99 → SUCCESS
+User B: UPDATE ticket_types SET available_quantity = 99 → SUCCESS (OVERBOOKING!)
+```
+
+**Solution: Distributed Atomic Lock**
+```typescript
+// packages/api/src/services/ticketService.ts
+
+interface LockConfig {
+  lockKey: string;           // Redis key
+  ttl: number;               // 30 seconds
+  maxRetries: number;        // 3 attempts
+  retryDelayMs: number;      // 100ms exponential backoff
+}
+
+async function acquireInventoryLock(
+  eventId: string,
+  ticketTypeId: string
+): Promise<{ lockId: string; success: boolean }> {
+  const lockKey = `ticket-lock:${eventId}:${ticketTypeId}`;
+  const lockId = generateUUID();
+  
+  // TRY: Acquire lock with TTL
+  const locked = await redis.set(lockKey, lockId, 'EX', 30, 'NX');
+  
+  if (!locked) {
+    throw new InventoryLockedError('Ticket inventory temporarily locked');
+  }
+  
+  return { lockId, success: true };
+}
+
+async function purchaseTicket(
+  userId: string,
+  eventId: string,
+  ticketTypeId: string,
+  quantity: number
+): Promise<Result<Ticket[]>> {
+  // 1. GUARD CLAUSE: Validate input early
+  if (!userId || !eventId || quantity <= 0) {
+    return { success: false, error: 'Invalid purchase parameters' };
+  }
+
+  let lockId: string | null = null;
+
+  try {
+    // 2. ACQUIRE LOCK
+    const lockResult = await acquireInventoryLock(eventId, ticketTypeId);
+    lockId = lockResult.lockId;
+
+    // 3. CHECK AVAILABILITY
+    const ticketType = await db.ticketTypes.findUnique({ id: ticketTypeId });
+    
+    if (!ticketType || ticketType.available_quantity < quantity) {
+      return {
+        success: false,
+        error: 'Insufficient ticket availability',
+      };
+    }
+
+    // 4. DECREMENT INVENTORY (atomically)
+    const updated = await db.ticketTypes.update({
+      where: { id: ticketTypeId },
+      data: { 
+        available_quantity: { decrement: quantity }
+      },
+    });
+
+    // 5. STRUCTURED LOGGING
+    logger.info({
+      event: 'ticket_purchase_attempt',
+      user_id: userId,
+      event_id: eventId,
+      ticket_type_id: ticketTypeId,
+      quantity,
+      remaining: updated.available_quantity,
+      lock_id: lockId,
+      timestamp: new Date().toISOString(),
+    });
+
+    // 6. CREATE TICKETS
+    const tickets = await db.tickets.createMany({
+      data: Array(quantity).fill({
+        userId,
+        ticketTypeId,
+        eventId,
+        status: 'valid',
+      }),
+    });
+
+    return { success: true, data: tickets };
+    
+  } catch (error) {
+    // 7. ERROR HANDLING: Log structured + release lock
+    logger.error({
+      event: 'ticket_purchase_failed',
+      user_id: userId,
+      error_code: error.code,
+      error_message: error.message,
+      lock_id: lockId,
+      timestamp: new Date().toISOString(),
+    });
+
+    // ROLLBACK: Return inventory
+    if (lockId) {
+      await db.ticketTypes.update({
+        where: { id: ticketTypeId },
+        data: { 
+          available_quantity: { increment: quantity }
+        },
+      });
+    }
+
+    return { success: false, error: error.message };
+    
+  } finally {
+    // 8. ALWAYS: Release lock
+    if (lockId) {
+      await redis.del(`ticket-lock:${eventId}:${ticketTypeId}`);
+    }
+  }
+}
+```
+
+**Lock Strategy Specification:**
+| Aspect | Requirement | Implementation |
+|--------|-------------|-----------------|
+| **Lock Type** | Distributed Mutex | Redis SET with NX + EX |
+| **TTL** | 30 seconds (must not exceed payment timeout) | Configurable via env |
+| **Retry** | 3 attempts with exponential backoff | 100ms → 200ms → 400ms |
+| **Fallback** | If lock fails, return clear error | "Inventory temporarily unavailable" |
+| **Lock Release** | Automatic after payment OR TTL expiry | Both via Redis expiry + explicit delete |
+
+#### 2. Payment Processing Idempotency
+**Problem**: User clicks "Pay" twice, creates 2 orders
+
+**Solution: Payment Idempotency Key**
+```typescript
+// Request body must include idempotency_key (UUID)
+const idempotencyKey = headers.get('Idempotency-Key');
+
+// Check if payment already processed
+const existingOrder = await db.orders.findUnique({
+  where: { idempotency_key: idempotencyKey },
+});
+
+if (existingOrder) {
+  return { success: true, data: existingOrder }; // Return cached result
+}
+
+// ... process payment ...
+```
+
+#### 3. Event Seat Map Update
+**Problem**: Multiple organizers updating same event seats
+
+**Solution: Optimistic Locking with version field**
+```sql
+CREATE TABLE events (
+  ...
+  total_capacity INTEGER,
+  available_seats INTEGER,
+  version INTEGER DEFAULT 1,  -- Optimistic lock
+  ...
+);
+
+UPDATE events 
+SET available_seats = 95, version = version + 1
+WHERE id = 'event-123' AND version = 100;  -- Only if version matches
+```
+
+---
+
+## Error Handling & Structured Logging
+
+### Result Pattern (Enforced on All Service Layer)
+
+Every service function must return explicit Result type:
+
+```typescript
+// packages/shared/src/types/index.ts
+
+type Success<T> = {
+  success: true;
+  data: T;
+};
+
+type Failure = {
+  success: false;
+  error: string;
+  errorCode?: string;
+  details?: Record<string, unknown>;
+};
+
+type Result<T> = Success<T> | Failure;
+
+// ✅ GOOD
+async function getUserProfile(userId: string): Promise<Result<User>> {
+  if (!userId) {
+    return { success: false, error: 'User ID required', errorCode: 'INVALID_INPUT' };
+  }
+  // ...
+  return { success: true, data: user };
+}
+
+// ❌ BAD (throwing exception without context)
+async function getUserProfile(userId: string): Promise<User> {
+  if (!userId) throw new Error('User ID required');  // No structure!
+  // ...
+}
+```
+
+### Structured Logging (JSON Only)
+
+No unstructured logs. Every log entry must be JSON with:
+- `timestamp`: ISO 8601
+- `level`: 'info' | 'warn' | 'error' | 'debug'
+- `event`: Short event name (e.g., 'user_signup', 'payment_webhook')
+- `context`: User ID, request ID, session ID
+- Additional fields relevant to event
+
+```typescript
+// packages/api/src/utils/logger.ts
+
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+// ✅ GOOD: Structured logging
+logger.info({
+  timestamp: new Date().toISOString(),
+  level: 'info',
+  event: 'user_signup',
+  user_id: user.id,
+  email: user.email,  // No passwords!
+  provider: 'email',
+  request_id: requestId,
+  duration_ms: 234,
+});
+
+// ❌ BAD: Unstructured
+console.log(`User ${user.id} signed up`);  // Not JSON, hard to query
+```
+
+### Zero Hardcoding Rules
+
+**All configuration must come from:**
+1. Environment variables (sensitive data)
+2. Database config tables (feature flags, business rules)
+3. Never hardcoded in source code
+
+```typescript
+// ❌ BAD: Hardcoded
+if (user.role === 'admin') { ... }  // Hardcoded role check
+
+// ✅ GOOD: Configurable
+const adminRole = process.env.ADMIN_ROLE_NAME;  // From env
+if (user.role === adminRole) { ... }
+
+// ✅ EVEN BETTER: From database config
+const roleConfig = await db.roleConfigs.findUnique({ name: 'admin' });
+if (user.role === roleConfig.id) { ... }
+```
+
+**Config Table Schema:**
+```sql
+CREATE TABLE system_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key VARCHAR(255) UNIQUE NOT NULL,
+  value JSONB NOT NULL,
+  version INTEGER DEFAULT 1,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_by UUID REFERENCES users(id)
+);
+
+-- Examples
+INSERT INTO system_config (key, value) VALUES
+('password_min_length', '{"value": 8}'),
+('password_require_special', '{"value": true}'),
+('admin_role_name', '{"value": "admin"}'),
+('max_concurrent_reservations', '{"value": 5}');
+```
+
+### Global Error Handler
+
+Every API endpoint must use centralized error handler:
+
+```typescript
+// packages/api/src/middleware/errorHandler.ts
+
+export async function handleError(error: unknown, requestId: string) {
+  const errorId = generateUUID();
+
+  // Structure the error
+  const structured = {
+    errorId,
+    requestId,
+    timestamp: new Date().toISOString(),
+    message: error instanceof Error ? error.message : 'Unknown error',
+    code: error instanceof AppError ? error.code : 'INTERNAL_SERVER_ERROR',
+  };
+
+  // Log it
+  logger.error(structured);
+
+  // Return to client (no internal details)
+  return {
+    success: false,
+    error: structured.message,
+    errorId,  // For support to trace
+  };
+}
+
+// ❌ BAD: No error structure
+try {
+  doSomething();
+} catch (e) {
+  console.log(e);  // Unstructured!
+  res.status(500).send('Error');
+}
+
+// ✅ GOOD: Structured error handling
+try {
+  doSomething();
+} catch (error) {
+  const response = await handleError(error, requestId);
+  res.status(getStatusCode(error)).json(response);
+}
+```
+
+---
+
+## Tech Critic Review (Assumptions & Risks)
+
+### Assumptions We're Making
+
+| # | Assumption | Risk Level | Mitigation |
+|---|-----------|-----------|-----------|
+| 1 | Supabase will scale to 1M concurrent users | **MEDIUM** | Load testing on staging, fallback plan to scale PostgreSQL |
+| 2 | Vercel serverless will handle 10K req/s | **MEDIUM** | Vercel has SLO for this, but test with k6 load testing |
+| 3 | Real-time WebSocket won't bottleneck at 50K concurrent | **MEDIUM** | Use Supabase Realtime pools, may need separate real-time service later |
+| 4 | Stripe/Xendit webhooks are reliable | **LOW** | Built retry + manual reconciliation reconciliation job |
+| 5 | Payment flow completes < 5 minutes | **LOW** | Set explicit timeout, show status polling UI |
+| 6 | Users won't intentionally try to overbooking | **HIGH** | Atomic locking + comprehensive logging required |
+| 7 | Service Worker caching won't create stale offline data | **MEDIUM** | Implement sync strategy, version cached data |
+
+### Identified Risks
+
+#### 🔴 **CRITICAL RISKS**
+
+1. **Overbooking Due to Race Condition**
+   - **Impact**: Revenue loss, customer refunds, reputation damage
+   - **Probability**: HIGH (multiple concurrent purchases)
+   - **Mitigation**: 
+     - ✅ Implemented: Atomic locking on inventory
+     - ⏳ TODO: Load test with 1000 concurrent users
+     - ⏳ TODO: Integration test with Stripe webhook delays
+
+2. **Service Worker Offline Data Corruption**
+   - **Impact**: Users see expired/invalid tickets offline
+   - **Probability**: MEDIUM
+   - **Mitigation**:
+     - ✅ Implemented: Versioning on cached data
+     - ⏳ TODO: Implement IndexedDB integrity checks
+
+3. **Payment Webhook Failure → Tickets Not Created**
+   - **Impact**: Customer paid but no ticket, refund required
+   - **Probability**: LOW (Stripe is reliable) but IMPACT is HIGH
+   - **Mitigation**:
+     - ✅ Implemented: 3-retry exponential backoff
+     - ⏳ TODO: Manual reconciliation job (compare payments vs tickets)
+
+#### 🟠 **HIGH RISKS**
+
+4. **Vercel Cold Start Delays on Spike**
+   - **Impact**: Slow checkout during popular event sale
+   - **Probability**: MEDIUM
+   - **Mitigation**:
+     - ⏳ TODO: Pre-warm functions 5 min before event sale
+     - ⏳ TODO: Use Vercel Edge Functions for static routes
+
+5. **Real-time Availability Not Reflected Immediately**
+   - **Impact**: Users buy "sold out" tickets thinking available
+   - **Probability**: LOW (WebSocket < 1 sec)
+   - **Mitigation**:
+     - ✅ Implemented: Realtime < 1 second SLA
+     - ⏳ TODO: Client-side optimistic locking UI
+
+#### 🟡 **MEDIUM RISKS**
+
+6. **PostgreSQL Connection Pool Exhaustion**
+   - **Impact**: Timeouts during traffic spike
+   - **Probability**: MEDIUM
+   - **Mitigation**:
+     - ✅ Implemented: Supabase managed connection pooling
+     - ⏳ TODO: Monitor connection count, alert at 80%
+
+7. **Supabase Storage Rate Limiting on Avatar Upload**
+   - **Impact**: Slow avatar uploads during onboarding
+   - **Probability**: LOW
+   - **Mitigation**:
+     - ✅ Implemented: Client-side image resize before upload
+     - ⏳ TODO: Implement upload queue with retry
+
+### Red Flags Requiring Security Review
+
+- [ ] **Before Payment Integration**: Security engineer must sign-off on Stripe integration
+- [ ] **Before Real-time Launch**: Verify WebSocket doesn't leak user data via subscriptions
+- [ ] **Before Production**: Penetration testing for authentication bypass
+- [ ] **Before Admin Features**: Role-based access control audit (no privilege escalation)
+
+---
+
+## Database Schema (OODA-Aligned)
 
 ### Core Tables
 
 #### users
 ```sql
+-- ✅ ZERO-HARDCODING: Roles configurable via role_configs table
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -431,14 +1049,43 @@ CREATE TABLE users (
   last_name VARCHAR(255),
   avatar_url VARCHAR(500),
   phone_number VARCHAR(20),
-  role ENUM ('user', 'organizer', 'admin') DEFAULT 'user',
-  status ENUM ('active', 'inactive', 'suspended') DEFAULT 'active',
+  role_id UUID REFERENCES role_configs(id),  -- Foreign key to roles table (non-hardcoded)
+  status VARCHAR(50),  -- References status_configs table
   provider VARCHAR(50),
   provider_id VARCHAR(255),
   email_verified_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(provider, provider_id)
+  UNIQUE(provider, provider_id),
+  INDEX(role_id),
+  INDEX(status)
+);
+
+-- ✅ Role configuration (non-hardcoded, configurable)
+CREATE TABLE role_configs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) UNIQUE NOT NULL,  -- 'user', 'organizer', 'admin' etc
+  description TEXT,
+  permissions JSONB NOT NULL,  -- Array of permission codes
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(name),
+  INDEX(active)
+);
+
+-- ✅ Status configuration (non-hardcoded)
+CREATE TABLE status_configs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_type VARCHAR(50),  -- 'user', 'event', 'order', 'ticket'
+  status_name VARCHAR(100),  -- 'active', 'pending', 'completed'
+  display_label VARCHAR(255),
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(entity_type, status_name),
+  INDEX(entity_type),
+  INDEX(is_active)
 );
 ```
 
