@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>Discover Events / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/events.css">
+</head>
+<body>
+  <a class="skip-link" href="#events-main">Skip to events</a>
+  <header class="site-header" data-reveal>
+    <a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a class="nav-link nav-link-active" href="events.html">Discover</a>
+      <a class="nav-link" href="../index.html#categories">Categories</a>
+      <a class="nav-link" href="#saved">Saved <span class="nav-count">2</span></a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button" type="button" data-toast="Notifications are quiet for now" aria-label="Open notifications">&#9825;</button>
+      <button class="profile-button" type="button" data-toast="Profile menu preview"><span class="avatar">VS</span><span class="profile-name">Vergenscande</span><span aria-hidden="true">&#8964;</span></button>
+      <button class="menu-button" type="button" data-toast="Menu preview opened" aria-label="Open menu">&#9776;</button>
+    </div>
+  </header>
+
+  <main id="events-main" class="events-main">
+    <section class="listing-intro section-shell" data-reveal>
+      <div>
+        <p class="eyebrow">Explore the calendar</p>
+        <h1>Make a little<br><em>room for plans.</em></h1>
+      </div>
+      <p class="listing-intro-copy">Find the right kind of busy. Browse small gatherings, bright rooms, and reasons to make the trip.</p>
+    </section>
+
+    <section class="listing-shell section-shell" aria-labelledby="listing-title">
+      <div class="listing-toolbar" data-reveal>
+        <div class="listing-search-wrap">
+          <label class="sr-only" for="listing-search">Search events</label>
+          <span class="search-icon" aria-hidden="true">&#9906;</span>
+          <input id="listing-search" type="search" placeholder="Search by event, city, or mood">
+        </div>
+        <button class="filter-trigger" type="button" data-filter-toggle aria-expanded="false">Filters <span>+</span></button>
+        <label class="sort-control">Sort by
+          <select data-sort aria-label="Sort events">
+            <option value="soonest">Soonest</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+        <div class="segmented-control" role="group" aria-label="Event view">
+          <button class="segment segment-active" type="button" data-view="cards" aria-pressed="true">Cards</button>
+          <button class="segment" type="button" data-view="list" aria-pressed="false">List</button>
+        </div>
+      </div>
+      <div class="filter-panel listing-filters" data-filter-panel hidden>
+        <button class="filter-chip chip-active" type="button" data-filter="all">All events</button>
+        <button class="filter-chip" type="button" data-filter="music">Music</button>
+        <button class="filter-chip" type="button" data-filter="make">Make</button>
+        <button class="filter-chip" type="button" data-filter="film">Film</button>
+        <button class="filter-chip" type="button" data-filter="jakarta">Jakarta</button>
+        <button class="filter-chip" type="button" data-filter="bandung">Bandung</button>
+      </div>
+
+      <div class="listing-heading">
+        <div><p class="eyebrow">Curated for you</p><h2 id="listing-title">All events <span data-result-count>06</span></h2></div>
+        <p class="listing-location">Jakarta, Indonesia <button type="button" data-toast="Location selector preview" aria-label="Change location">&#8964;</button></p>
+      </div>
+
+      <div class="listing-grid" data-listing-grid>
+        <article class="listing-card" data-category="film" data-city="jakarta" data-name="Sunset Cinema" data-price="150" data-date="20260926" data-search="sunset cinema rooftop jakarta film">
+          <div class="listing-card-visual visual-cinema"><span class="event-date">26 SEP</span><button class="save-button" type="button" data-save aria-label="Save Sunset Cinema">&#9825;</button><span class="image-label">ROOFTOP / 01</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Film / Jakarta</span><span>Rp150k</span></div><h3>Sunset Cinema</h3><p>Films above the city, with a little room for conversation.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+        <article class="listing-card" data-category="make" data-city="bandung" data-name="Slow Sunday" data-price="220" data-date="20260927" data-search="slow sunday workshop bandung ceramics make">
+          <div class="listing-card-visual visual-workshop"><span class="event-date">27 SEP</span><button class="save-button" type="button" data-save aria-label="Save Slow Sunday">&#9825;</button><span class="image-label">MAKE / 07</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Make / Bandung</span><span>Rp220k</span></div><h3>Slow Sunday</h3><p>A gentle ceramics workshop for hands that need something to do.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+        <article class="listing-card" data-category="music" data-city="surabaya" data-name="After Hours" data-price="180" data-date="20261002" data-search="after hours jazz surabaya music">
+          <div class="listing-card-visual visual-jazz"><span class="event-date">02 OCT</span><button class="save-button" type="button" data-save aria-label="Save After Hours">&#9825;</button><span class="image-label">LISTEN / 22</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Music / Surabaya</span><span>Rp180k</span></div><h3>After Hours</h3><p>Late jazz, low lights, and the part of the night that feels unplanned.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+        <article class="listing-card" data-category="music" data-city="jakarta" data-name="Night Market Radio" data-price="280" data-date="20260924" data-search="night market radio jakarta music live">
+          <div class="listing-card-visual visual-radio"><span class="event-date">24 SEP</span><button class="save-button" type="button" data-save aria-label="Save Night Market Radio">&#9825;</button><span class="image-label">LIVE / 14</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Music / Jakarta</span><span>Rp280k</span></div><h3>Night Market Radio</h3><p>Live frequencies, late food, and a room full of people who stayed.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+        <article class="listing-card" data-category="film" data-city="bandung" data-name="Frames in Blue" data-price="120" data-date="20261004" data-search="frames blue film bandung cinema">
+          <div class="listing-card-visual visual-frames"><span class="event-date">04 OCT</span><button class="save-button" type="button" data-save aria-label="Save Frames in Blue">&#9825;</button><span class="image-label">WATCH / 09</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Film / Bandung</span><span>Rp120k</span></div><h3>Frames in Blue</h3><p>A weekend film program for stories that stay with you after dark.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+        <article class="listing-card" data-category="make" data-city="jakarta" data-name="Print Club" data-price="190" data-date="20261008" data-search="print club make jakarta workshop poster">
+          <div class="listing-card-visual visual-print"><span class="event-date">08 OCT</span><button class="save-button" type="button" data-save aria-label="Save Print Club">&#9825;</button><span class="image-label">MAKE / 12</span></div>
+          <div class="listing-card-content"><div class="card-topline"><span>Make / Jakarta</span><span>Rp190k</span></div><h3>Print Club</h3><p>Ink, paper, and an evening to make something you can take home.</p><a class="text-link" href="#event-detail">View event <span aria-hidden="true">&#8599;</span></a></div>
+        </article>
+      </div>
+      <p class="empty-state" data-empty-state hidden>No events match these filters. Try opening the calendar a little wider.</p>
+      <nav class="pagination" aria-label="Event pages"><button type="button" class="page-button page-active" aria-current="page">1</button><button type="button" class="page-button" data-toast="Page 2 preview">2</button><button type="button" class="page-button" data-toast="Page 3 preview">3</button><span>...</span><button type="button" class="page-button" data-toast="Next page preview" aria-label="Next page">&#8594;</button></nav>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/events.js"></script>
+</body>
+</html>
