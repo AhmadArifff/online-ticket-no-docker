@@ -54,5 +54,18 @@ document.querySelector('[data-copy-reference]')?.addEventListener('click', async
   setTimeout(() => { event.currentTarget.textContent = 'Copy'; }, 1800);
 });
 
+document.querySelector('[data-primary-action]')?.addEventListener('click', () => {
+  const state = document.querySelector('[data-payment-state]').dataset.paymentState;
+  if (state === 'success') {
+    window.location.href = 'ticket-wallet.html';
+    return;
+  }
+  if (state === 'failed' || state === 'cancelled') {
+    window.location.href = 'checkout.html';
+    return;
+  }
+  showToast('Payment status is still processing');
+});
+
 const state = new URLSearchParams(window.location.search).get('state');
 if (state && ['success', 'pending', 'failed', 'cancelled'].includes(state)) setPaymentState(state);

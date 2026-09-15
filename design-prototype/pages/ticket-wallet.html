@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>My tickets / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/ticket-wallet.css">
+</head>
+<body class="wallet-body">
+  <a class="skip-link" href="#wallet-main">Skip to tickets</a>
+  <header class="site-header wallet-header"><a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a><nav class="desktop-nav" aria-label="Primary navigation"><a class="nav-link" href="events.html">Discover</a><a class="nav-link nav-link-active" href="ticket-wallet.html">My tickets <span class="nav-count">2</span></a></nav><div class="header-actions"><span class="offline-status"><i></i> Available offline</span><button class="profile-button" type="button" data-toast="Profile menu preview"><span class="avatar">VS</span><span class="profile-name">Vergenscande</span><span aria-hidden="true">&#8964;</span></button><button class="menu-button" type="button" data-toast="Menu preview opened" aria-label="Open menu">&#9776;</button></div></header>
+  <main id="wallet-main" class="wallet-main section-shell">
+    <section class="wallet-heading" data-reveal><div><p class="eyebrow">Your little archive</p><h1>Places you<br><em>are going.</em></h1></div><button class="button button-dark" type="button" data-toast="Discover events preview">Find another event <span aria-hidden="true">&#8599;</span></button></section>
+    <section class="wallet-toolbar" data-reveal><div class="wallet-tabs" role="tablist" aria-label="Ticket history"><button class="wallet-tab wallet-tab-active" type="button" role="tab" aria-selected="true" data-wallet-tab="upcoming">Upcoming <span>02</span></button><button class="wallet-tab" type="button" role="tab" aria-selected="false" data-wallet-tab="past">Past <span>04</span></button></div><div class="wallet-tools"><label class="wallet-search"><span aria-hidden="true">&#9906;</span><span class="sr-only">Search tickets</span><input type="search" data-ticket-search placeholder="Search tickets"></label><button class="filter-trigger" type="button" data-filter-toggle aria-expanded="false">Filter <span>+</span></button></div></section>
+    <div class="filter-panel wallet-filters" data-filter-panel hidden><button class="filter-chip chip-active" type="button" data-ticket-filter="all">All</button><button class="filter-chip" type="button" data-ticket-filter="valid">Valid</button><button class="filter-chip" type="button" data-ticket-filter="used">Used</button><button class="filter-chip" type="button" data-ticket-filter="refunded">Refunded</button></div>
+    <section class="ticket-list" data-ticket-list aria-live="polite">
+      <article class="wallet-ticket" data-ticket-item data-ticket-status="valid" data-ticket-tab="upcoming" data-ticket-search="night market radio jakarta music valid">
+        <div class="wallet-ticket-art art-radio"><span>GATHER / 014</span><strong>NIGHT<br>MARKET<br>RADIO</strong><small>24 SEP / JAKARTA</small></div><div class="wallet-ticket-info"><div class="ticket-status-line"><span class="ticket-status status-valid"><i></i> Valid ticket</span><span class="ticket-date">24 September 2026</span></div><h2>Night Market Radio</h2><p>M Bloc Space · Jakarta Selatan</p><div class="ticket-meta"><span>Supporter<br><b>2 tickets</b></span><span>Order<br><b>GTH-240926-0142</b></span></div><div class="ticket-actions"><a class="button button-dark" href="ticket-detail.html">Open ticket <span aria-hidden="true">&#8594;</span></a><button class="outline-button" type="button" data-toast="Transfer flow preview">Transfer</button><button class="icon-action" type="button" data-toast="More ticket actions" aria-label="More ticket actions">•••</button></div></div><div class="offline-badge">Saved offline</div>
+      </article>
+      <article class="wallet-ticket" data-ticket-item data-ticket-status="valid" data-ticket-tab="upcoming" data-ticket-search="slow sunday bandung workshop valid">
+        <div class="wallet-ticket-art art-workshop"><span>GATHER / 007</span><strong>SLOW<br>SUNDAY</strong><small>27 SEP / BANDUNG</small></div><div class="wallet-ticket-info"><div class="ticket-status-line"><span class="ticket-status status-valid"><i></i> Valid ticket</span><span class="ticket-date">27 September 2026</span></div><h2>Slow Sunday</h2><p>Selasar Sunaryo · Bandung</p><div class="ticket-meta"><span>Regular<br><b>1 ticket</b></span><span>Order<br><b>GTH-240926-0191</b></span></div><div class="ticket-actions"><a class="button button-dark" href="ticket-detail.html">Open ticket <span aria-hidden="true">&#8594;</span></a><button class="outline-button" type="button" data-toast="Refund request preview">Refund</button><button class="icon-action" type="button" data-toast="More ticket actions" aria-label="More ticket actions">•••</button></div></div><div class="offline-badge">Saved offline</div>
+      </article>
+      <article class="wallet-ticket wallet-ticket-past" data-ticket-item data-ticket-status="used" data-ticket-tab="past" data-ticket-search="after hours surabaya music used" hidden>
+        <div class="wallet-ticket-art art-jazz"><span>GATHER / 022</span><strong>AFTER<br>HOURS</strong><small>02 SEP / SURABAYA</small></div><div class="wallet-ticket-info"><div class="ticket-status-line"><span class="ticket-status status-used"><i></i> Used</span><span class="ticket-date">02 September 2026</span></div><h2>After Hours</h2><p>De Majestic · Surabaya</p><div class="ticket-meta"><span>Regular<br><b>1 ticket</b></span><span>Order<br><b>GTH-240902-0074</b></span></div><div class="ticket-actions"><a class="outline-button" href="ticket-detail.html">View details <span aria-hidden="true">&#8594;</span></a><button class="icon-action" type="button" data-toast="More ticket actions" aria-label="More ticket actions">•••</button></div></div>
+      </article>
+    </section>
+    <p class="empty-state" data-empty-state hidden>No tickets match your current view.</p>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/ticket-wallet.js"></script>
+</body>
+</html>
