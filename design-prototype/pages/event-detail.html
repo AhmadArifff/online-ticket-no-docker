@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <title>Night Market Radio / Gather Prototype</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/event-detail.css">
+</head>
+<body>
+  <a class="skip-link" href="#event-detail-main">Skip to event details</a>
+  <header class="site-header" data-reveal>
+    <a class="brand" href="../index.html" aria-label="Gather home"><span class="brand-mark" aria-hidden="true">G</span><span>gather<span class="brand-dot">.</span></span></a>
+    <nav class="desktop-nav" aria-label="Primary navigation"><a class="nav-link" href="events.html">Discover</a><a class="nav-link" href="../index.html#categories">Categories</a><a class="nav-link" href="#saved">Saved <span class="nav-count">2</span></a></nav>
+    <div class="header-actions"><button class="icon-button" type="button" data-toast="Notifications are quiet for now" aria-label="Open notifications">&#9825;</button><button class="profile-button" type="button" data-toast="Profile menu preview"><span class="avatar">VS</span><span class="profile-name">Vergenscande</span><span aria-hidden="true">&#8964;</span></button><button class="menu-button" type="button" data-toast="Menu preview opened" aria-label="Open menu">&#9776;</button></div>
+  </header>
+
+  <main id="event-detail-main" class="detail-main">
+    <div class="detail-breadcrumb section-shell"><a href="events.html" class="text-link">&#8592; Back to discover</a><span>Music / Jakarta</span></div>
+    <section class="detail-hero section-shell" data-reveal>
+      <div class="detail-poster poster-radio"><span class="poster-code">GATHER / 014</span><div class="poster-orbit" aria-hidden="true"></div><strong>NIGHT<br>MARKET<br>RADIO</strong><span class="poster-footer">M BLOC SPACE / JAKARTA</span></div>
+      <div class="detail-hero-copy"><div class="detail-actions"><span class="status-badge"><i></i> Tickets available</span><button class="round-action" type="button" data-save aria-label="Save Night Market Radio">&#9825;</button><button class="round-action" type="button" data-toast="Share link copied">&#8599;</button></div><p class="eyebrow">Thursday, 24 September 2026</p><h1>Night Market<br><em>Radio</em></h1><p class="detail-lead">Live frequencies, late food, and a room full of people who stayed. A night of curious sounds from Jakarta and beyond.</p><div class="detail-facts"><span><b>19:00</b> Doors open</span><span><b>M Bloc Space</b> Jakarta Selatan</span></div></div>
+    </section>
+
+    <section class="detail-body section-shell">
+      <div class="detail-content">
+        <div class="detail-tabs" role="tablist" aria-label="Event information"><button class="detail-tab tab-active" type="button" role="tab" aria-selected="true" data-tab="about">About</button><button class="detail-tab" type="button" role="tab" aria-selected="false" data-tab="schedule">Schedule</button><button class="detail-tab" type="button" role="tab" aria-selected="false" data-tab="venue">Venue</button></div>
+        <div class="tab-panel" data-panel="about"><h2>A frequency of its own</h2><p>Night Market Radio is a monthly gathering for people who like their music discovered, not recommended. Expect warm rooms, unexpected guests, and food that keeps the conversation going.</p><div class="detail-highlight"><span class="highlight-number">04</span><span>live sets<br><small>across one night</small></span><span class="highlight-number">01</span><span>shared room<br><small>at M Bloc Space</small></span></div></div>
+        <div class="tab-panel" data-panel="schedule" hidden><h2>The evening, loosely planned</h2><div class="schedule-row"><span>19:00</span><strong>Doors + market</strong><small>Eat something first.</small></div><div class="schedule-row"><span>20:30</span><strong>First signal</strong><small>Live set in the main room.</small></div><div class="schedule-row"><span>22:00</span><strong>Night transmission</strong><small>Headliners, low lights.</small></div></div>
+        <div class="tab-panel" data-panel="venue" hidden><h2>M Bloc Space</h2><p>Jl. Panglima Polim No. 37, Jakarta Selatan. A former housing complex turned into a small city of music, food, and independent ideas.</p><button class="outline-button" type="button" data-toast="Map preview opened">Open map preview &#8599;</button></div>
+        <div class="organizer-row"><div class="organizer-avatar">NM</div><div><span class="eyebrow">Presented by</span><strong>Night Market Collective</strong><p>Independent music and good rooms.</p></div><button class="outline-button" type="button" data-toast="Organizer profile preview">View profile</button></div>
+        <div class="review-preview"><div><span class="eyebrow">From the room</span><h2>“The kind of night<br>that resets you.”</h2></div><div class="rating"><strong>4.9</strong><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>Based on 48 reviews</small></div></div>
+      </div>
+      <aside class="ticket-panel" aria-labelledby="ticket-title"><div class="live-availability"><span class="pulse-dot"></span><span><strong data-availability>126</strong> spots left</span><small>updated just now</small></div><h2 id="ticket-title">Choose your<br><em>ticket.</em></h2><div class="ticket-options"><button class="ticket-option ticket-option-active" type="button" data-ticket="Regular" data-price="280000" aria-pressed="true"><span><strong>Regular</strong><small>Access all night</small></span><b>Rp280k</b></button><button class="ticket-option" type="button" data-ticket="Supporter" data-price="450000" aria-pressed="false"><span><strong>Supporter</strong><small>Access + good karma</small></span><b>Rp450k</b></button></div><div class="quantity-row"><span>Quantity</span><div class="stepper"><button type="button" data-quantity="decrease" aria-label="Decrease quantity">−</button><strong data-quantity-value>1</strong><button type="button" data-quantity="increase" aria-label="Increase quantity">+</button></div></div><div class="price-total"><span>Total</span><strong data-total>Rp280k</strong></div><button class="button button-dark purchase-button" type="button" data-purchase>Continue to checkout <span aria-hidden="true">&#8594;</span></button><p class="secure-note">Secure checkout · Instant confirmation · Free cancellation within 30 minutes</p></aside>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast-region></div>
+  <script type="module" src="../scripts/event-detail.js"></script>
+</body>
+</html>
