@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.6
-**Version**: 1.6
+**Status**: Rework Required - Agentic Alignment v1.7
+**Version**: 1.7
 **Last Updated**: 2026-09-16
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -509,6 +509,8 @@ Status is updated together with prototype changes so visual decisions remain tra
 | `admin-001` | Implemented fixture | Independent RBAC, confirmation, and audit review remain | `design-prototype/pages/admin-operations.html` |
 | `system-001` | Implemented fixture | Connect shared states to page review evidence and keyboard recovery checks | `design-prototype/pages/system-states.html` |
 
+| Global prototype layer | Implemented fixture | Expand translation catalog, run contrast review for dark mode, and capture independent visual evidence | `design-prototype/scripts/site-enhancements.js` + `design-prototype/styles/site-enhancements.css` |
+
 Current prototype verdict: `rework`.
 The prototype must not enter the monorepo UI package until the remaining pages, state coverage, responsive/accessibility evidence, and independent review verdicts are recorded.
 
@@ -535,6 +537,7 @@ Every production route must preserve these transitions with real auth, API, and 
 | 2026-09-16 | Added high-contrast ticket detail surface with QR fixture, zoom, bright scan mode, download, wallet save, and ticket states | Close the broken wallet-to-ticket flow and cover `ticket-002` interaction direction | `ticket-002` moved from pending to implemented fixture |
 | 2026-09-16 | Added system-state gallery for 404, 500, maintenance, offline, loading, empty, and access denied | Establish a shared visual language for recovery and degraded states | `system-001` moved from pending to implemented fixture |
 | 2026-09-16 | Updated prototype README page inventory | Keep implementation status visible beside the prototype | Tracking baseline established |
+| 2026-09-16 | Added persistent light/dark theme, English/Indonesian toggle, smooth text transitions, and lightweight pointer tilt enhancement | Improve cross-page consistency and interaction quality without adding a heavy runtime dependency | Global prototype layer added; browser smoke test passed on 13 routes |
 
 ### Prototype-to-Monorepo Handoff
 
@@ -1736,6 +1739,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 | 1.4 | 2026-09-16 | vergenscande | Added prototype implementation tracking, visual change log, ticket detail fixture, and system-state fixture |
 | 1.5 | 2026-09-16 | vergenscande | Added organizer dashboard and event editor fixtures with metrics, live preview, autosave, ticket tiers, validation, and publish guard |
 | 1.6 | 2026-09-16 | vergenscande | Added admin operations fixture, prototype hub, cross-page integration map, and recovery route contract |
+| 1.7 | 2026-09-16 | vergenscande | Added global theme/language controls, smooth bilingual text transitions, reduced-motion guards, and lightweight 3D tilt enhancement |
 
 ---
 

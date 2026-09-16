@@ -19,6 +19,9 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 - Ticket QR detail with valid, used, invalid, and offline states
 - Bright scan mode, QR zoom, ticket download, and wallet save preview
 - System state gallery: 404, 500, maintenance, offline, loading, empty, and access denied
+- Persistent light/dark theme toggle with accessible labels and theme-color sync
+- English/Indonesian language toggle with reduced-motion-aware text transitions
+- Lightweight pointer tilt enhancement for existing CSS 3D ticket surfaces
 - Organizer dashboard with sales metrics, event switcher, chart, activity, and export preview
 - Event editor with live preview, autosave state, ticket type editor, validation, and publish guard
 - Admin operations with orders, users/audit tabs, filters, permission watch, and runtime toggles
