@@ -50,4 +50,15 @@ Open `index.html` directly in a browser. The prototype has no production API, au
 
 Open `pages/prototype-hub.html` to review every fixture route. The customer flow is Home -> Events -> Event detail -> Checkout -> Payment -> Wallet -> QR detail. Organizer, admin, and recovery routes are available from the same map, and `PRD.md` contains the route transition contract.
 
+## Cara membaca alur
+
+Prototype ini memiliki empat jalur utama:
+
+1. **Customer**: Home -> Events -> Event detail -> Login bila diperlukan -> Checkout -> Payment -> Wallet -> QR detail.
+2. **Organizer**: Login dengan role organizer -> Dashboard -> Event editor -> Draft/autosave -> Publish -> Dashboard.
+3. **Admin**: Login dengan role admin -> Admin operations -> Users/orders/audit/master data -> System states bila akses ditolak.
+4. **Recovery**: Timeout, payment pending/failed, inventory lock, offline, atau halaman hilang -> System states -> Retry, kembali, atau buka data cache.
+
+Link langsung di prototype adalah shortcut review fixture. Pada production, auth, RBAC, inventory hold, webhook payment, dan kepemilikan tiket tetap diputuskan oleh server seperti dijelaskan dalam `PRD.md`.
+
 The prototype remains fixture-only. It has no production authentication, payment provider, Supabase connection, service worker, or API integration.

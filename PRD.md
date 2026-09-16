@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Sistem Online Tiket Cross-Platform dengan PWA
 
-**Status**: Rework Required - Agentic Alignment v1.7
-**Version**: 1.7
+**Status**: Rework Required - Agentic Alignment v1.8
+**Version**: 1.8
 **Last Updated**: 2026-09-16
 **Governance Framework**: OODA Loop + Separation of Duty  
 **Author**: vergenscande  
@@ -529,6 +529,68 @@ The standalone prototype is navigable through `design-prototype/pages/prototype-
 | Recovery | Any state failure -> `pages/system-states.html -> pages/prototype-hub.html` | Return to a known route without dead ends |
 
 Every production route must preserve these transitions with real auth, API, and database contracts. A page is not integrated when it only renders in isolation; its primary, secondary, back, error, and recovery actions must resolve to a documented route or an explicit `blocked-escalate` review item.
+
+### Canonical Application Flow
+
+The prototype is a visual map of one product with four actor journeys. A page is not a separate application; it is a state in one of these journeys.
+
+```mermaid
+flowchart TD
+  H[Home / Discovery] --> L[Event listing]
+  L --> D[Event detail]
+  D --> A{Authenticated?}
+  A -->|No| AU[Login / Signup]
+  AU --> AV[Verification / recovery]
+  AV --> C[Checkout]
+  A -->|Yes| C
+  C -->|Inventory hold + validation| P[Payment handoff]
+  P --> PS{Payment state}
+  PS -->|success| W[Ticket wallet]
+  PS -->|pending| PO[Order status polling]
+  PS -->|failed/cancelled| C
+  W --> Q[Ticket / QR detail]
+  H -->|Organizer role| O[Organizer dashboard]
+  O --> E[Event editor]
+  E -->|draft/autosave/publish| O
+  H -->|Admin role| AD[Admin operations]
+  AD --> S[System states / recovery]
+  PO --> S
+  C -->|timeout/lock unavailable| S
+```
+
+#### Actor and access rules
+
+| Actor | Can enter without login | Login required | Role required | Primary success outcome |
+|---|---|---|---|---|
+| Guest | Home, event listing, event detail, public system states | Before checkout and ticket ownership | None | Reach checkout after auth redirect |
+| Customer | All public pages and own wallet | Checkout, payment status, wallet, QR detail | `customer` | Own a valid ticket and access its QR offline |
+| Organizer | Public pages | Organizer dashboard and editor | `organizer` | Publish and monitor owned events only |
+| Admin | Public pages | Admin operations | `admin` | Manage operations, master data, and audit activity |
+
+#### Production transition rules
+
+1. `event-detail.html` may be opened by a guest. Selecting `Continue to checkout` must check the session before creating an inventory hold.
+2. An unauthenticated customer is redirected to `auth.html` with a return target for checkout. After successful verification, the return target is restored; ticket selection and quantity are preserved only if the hold is still valid.
+3. Checkout creates one idempotent order attempt and one server-authoritative inventory hold. The browser timer is informative; expiry is decided by the server.
+4. Payment success is confirmed by the durable webhook/order state, not by the browser redirect. The customer may see `pending` until reconciliation finishes.
+5. Only a confirmed order opens `ticket-wallet.html`; only tickets belonging to the signed-in customer open `ticket-detail.html`.
+6. Organizer and admin routes require authentication and RBAC. A missing role goes to `system-001` with `access denied`; protected data must never render first.
+7. Any timeout, lock failure, provider failure, or unavailable network goes to an explicit recovery state with a valid next action: retry, return to checkout, view cached tickets, or report the issue.
+
+#### Prototype shortcut versus production behavior
+
+The standalone prototype may link directly between pages so reviewers can inspect visual states quickly. Those direct links are fixture shortcuts, not authorization or payment behavior. Production implementation must replace them with the transition rules above and preserve the same visible states.
+
+#### State ownership map
+
+| State | Owner of truth | Prototype representation | Production replacement |
+|---|---|---|---|
+| Ticket quantity and availability | Inventory service / database transaction | Local stepper and fixture count | Conditional decrement plus Redis coordination |
+| Inventory timer | Reservation service | Browser countdown | Server TTL and expiry transition |
+| Payment result | Payment provider webhook + order record | Query parameter and state buttons | Idempotent webhook persistence and reconciliation |
+| Ticket validity | Ticket validation service | Valid/used/invalid preview | Atomic check-in transition |
+| Theme and language | Browser preference | `localStorage` enhancement | Client preference, optionally synced to profile |
+| Access permission | Auth middleware and RBAC | Admin/organizer fixture pages | Protected route and API authorization |
 
 ### Prototype Visual Change Log
 
@@ -1740,6 +1802,7 @@ NEXT_PUBLIC_GA_ID=[GA_ID]
 | 1.5 | 2026-09-16 | vergenscande | Added organizer dashboard and event editor fixtures with metrics, live preview, autosave, ticket tiers, validation, and publish guard |
 | 1.6 | 2026-09-16 | vergenscande | Added admin operations fixture, prototype hub, cross-page integration map, and recovery route contract |
 | 1.7 | 2026-09-16 | vergenscande | Added global theme/language controls, smooth bilingual text transitions, reduced-motion guards, and lightweight 3D tilt enhancement |
+| 1.8 | 2026-09-16 | vergenscande | Clarified canonical customer, organizer, admin, and recovery flows, auth/RBAC gates, state ownership, and prototype shortcuts |
 
 ---
 
